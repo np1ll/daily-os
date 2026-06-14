@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Routine — Naveen</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root {
+  --lightest:#CEE4D8;--light:#B2D3C2;--light-mid:#8CB9A5;--mid:#5CA490;--mid-dark:#3E887B;--dark:#1A5A4C;--darker:#0E4A3E;
+  --bg:#0a1510;--surface:#111d16;--surface2:#172219;--border:#1f3327;--text:#CEE4D8;--muted:#5a8870;
+  --red:#d95f5f;--amber:#d4943a;--blue:#4f8fc0;--gold:#c9a84c;
+  --ff:'DM Sans',sans-serif;--fm:'DM Mono',monospace;--fd:'DM Serif Display',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100vh;padding:20px 16px 60px;max-width:500px;margin:0 auto;}
+
+.back-link{display:inline-flex;align-items:center;gap:6px;font-family:var(--fm);font-size:11px;color:var(--muted);text-decoration:none;margin-bottom:20px;padding:6px 10px;border:1px solid var(--border);border-radius:7px;transition:all .18s;}
+.back-link:hover{border-color:var(--mid);color:var(--mid);}
+
+.header{margin-bottom:24px;}
+.eyebrow{font-family:var(--fm);font-size:10px;color:var(--mid);letter-spacing:.18em;text-transform:uppercase;margin-bottom:4px;}
+.title{font-family:var(--fd);font-size:28px;color:var(--lightest);line-height:1.1;margin-bottom:6px;}
+.subtitle{font-size:12px;color:var(--muted);line-height:1.6;}
+
+.tabs{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:22px;}
+.tab{flex:1;padding:8px 4px;border:none;background:transparent;color:var(--muted);font-family:var(--ff);font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;transition:all .18s;text-align:center;}
+.tab.active{background:var(--dark);color:var(--lightest);}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* EXERCISE CARDS */
+.ex-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
+.ex-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.ex-num{font-family:var(--fm);font-size:11px;color:var(--muted);min-width:24px;}
+.ex-info{flex:1;}
+.ex-name{font-size:15px;font-weight:700;color:var(--lightest);margin-bottom:3px;}
+.ex-sets{font-family:var(--fm);font-size:11px;color:var(--mid);margin-bottom:6px;}
+.ex-cue{font-size:12px;color:var(--muted);line-height:1.6;}
+.ex-tag{font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.1em;border-radius:4px;padding:2px 6px;white-space:nowrap;}
+.tag-push{background:rgba(79,143,192,.12);color:var(--blue);}
+.tag-pull{background:rgba(92,164,144,.12);color:var(--mid);}
+.tag-core{background:rgba(201,168,76,.12);color:var(--gold);}
+.tag-rehab{background:rgba(217,95,95,.12);color:var(--red);}
+
+.ex-warning{background:rgba(217,95,95,.08);border:1px solid rgba(217,95,95,.2);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--red);line-height:1.5;}
+.ex-tip{background:rgba(92,164,144,.08);border:1px solid rgba(92,164,144,.2);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--light-mid);line-height:1.5;}
+
+.sec-label{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin:20px 0 10px;}
+.sec-label:first-child{margin-top:0;}
+
+.progression-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
+.prog-week{font-size:13px;font-weight:700;color:var(--lightest);margin-bottom:4px;}
+.prog-detail{font-size:11px;color:var(--muted);line-height:1.6;}
+.prog-arrow{color:var(--mid);margin:0 4px;}
+
+.note-card{background:var(--surface2);border-left:3px solid var(--mid-dark);border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:10px;}
+.note-title{font-size:12px;font-weight:700;color:var(--light-mid);margin-bottom:4px;}
+.note-body{font-size:11px;color:var(--muted);line-height:1.6;}
+
+.schedule-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;}
+.sg-head{font-family:var(--fm);font-size:9px;color:var(--muted);text-align:center;padding:4px 0;text-transform:uppercase;}
+.sg-cell{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 4px;text-align:center;font-size:10px;}
+.sg-cell.day-a{background:rgba(79,143,192,.12);border-color:rgba(79,143,192,.3);color:var(--blue);}
+.sg-cell.day-b{background:rgba(92,164,144,.12);border-color:rgba(92,164,144,.3);color:var(--mid);}
+.sg-cell.rest{background:var(--surface2);color:var(--muted);}
+.sg-label{font-weight:700;font-size:11px;}
+.sg-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+</style>
+</head>
+<body>
+
+<a href="daily-os-np.html" class="back-link">← Daily OS</a>
+
+<div class="header">
+  <div class="eyebrow">Health · Workout Routine</div>
+  <div class="title">Push · Pull · Rehab</div>
+  <div class="subtitle">Every other day · 30–35 min · Day A alternates with Day B · 1 free skip per week · no penalty</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('daya',this)">Day A — Push</button>
+  <button class="tab" onclick="switchTab('dayb',this)">Day B — Pull</button>
+  <button class="tab" onclick="switchTab('notes',this)">Notes</button>
+</div>
+
+<!-- ══ DAY A ══ -->
+<div class="panel active" id="panel-daya">
+  <div class="sec-label">Push + Core · ~30 min</div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">01</div>
+      <div class="ex-info">
+        <div class="ex-name">Push-ups</div>
+        <div class="ex-sets">3 sets · build toward failure · 60–90s rest between sets</div>
+        <div class="ex-cue">Start with whatever you can do with good form — currently ~30. Hands shoulder-width, body in a straight line from head to heels. Lower until chest nearly touches the floor, elbows at ~45° from body (not flared out wide). Full extension at the top but don't lock elbows. When you can hit 40+ reps in set 1 consistently, add a fourth set or try diamond push-ups.</div>
+      </div>
+      <div class="ex-tag tag-push">Push</div>
+    </div>
+  </div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">02</div>
+      <div class="ex-info">
+        <div class="ex-name">OYO Nova — Chest Fly or Shoulder Press</div>
+        <div class="ex-sets">2 sets · 12–15 reps · pick one per session</div>
+        <div class="ex-cue"><strong style="color:var(--lightest)">Chest fly:</strong> Stand on the band, handles at sides, slight forward lean. Bring handles together in front of your chest in a wide arc, slight bend in elbows throughout. Slow on the way back out — that's the work.<br><br><strong style="color:var(--lightest)">Shoulder press:</strong> Stand on band, handles at shoulder height, press straight overhead. Core tight, don't arch your lower back. Alternate between sessions to hit different angles.</div>
+      </div>
+      <div class="ex-tag tag-push">Push</div>
+    </div>
+    <div class="ex-tip">Alternate chest fly and shoulder press session to session — keeps it fresh and hits different angles.</div>
+  </div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">03</div>
+      <div class="ex-info">
+        <div class="ex-name">Lying Leg Raises</div>
+        <div class="ex-sets">3 sets · 10–15 reps · slow and controlled</div>
+        <div class="ex-cue">Lie flat on your back, hands under your lower back for support (palms down). Legs straight, raise them to ~90° then lower slowly — stop just before heels touch the floor. The lowering phase is where the core work happens. Keep your lower back pressed into the floor the whole time. If 15 reps gets easy, add a 4th set or hold a slight pause at the bottom.</div>
+      </div>
+      <div class="ex-tag tag-core">Core</div>
+    </div>
+  </div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">04</div>
+      <div class="ex-info">
+        <div class="ex-name">Plank</div>
+        <div class="ex-sets">2 holds · 30–45 sec · build to 60 sec over weeks</div>
+        <div class="ex-cue">Forearms on the floor, elbows under shoulders, body in a straight line. Squeeze your glutes and core — don't let your hips sag or pike up. Breathe steadily. If 45 sec is easy, extend to 60 sec before adding a third set. Quality over duration — a 30-second perfect plank beats a 60-second sagging one.</div>
+      </div>
+      <div class="ex-tag tag-core">Core</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DAY B ══ -->
+<div class="panel" id="panel-dayb">
+  <div class="sec-label">Pull + Rehab · ~35 min</div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">01</div>
+      <div class="ex-info">
+        <div class="ex-name">Pull-ups (or Cable Rows / OYO Rows)</div>
+        <div class="ex-sets">3 sets · as many as possible · 90s rest</div>
+        <div class="ex-cue"><strong style="color:var(--lightest)">Pull-ups (once bar is up):</strong> Dead hang start, pull until chin clears the bar. Squeeze shoulder blades together as you pull — don't just yank with arms. Lower slowly. Even 3–4 reps per set is excellent starting out.<br><br><strong style="color:var(--lightest)">Cable rows (gym):</strong> Seated, cable at chest height, pull to your lower chest with elbows close to body. Pause at peak contraction, slow release.<br><br><strong style="color:var(--lightest)">OYO rows (home, no bar yet):</strong> Anchor band to a door handle, lean back, row handles to your sides. Keep core engaged.</div>
+      </div>
+      <div class="ex-tag tag-pull">Pull</div>
+    </div>
+  </div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">02</div>
+      <div class="ex-info">
+        <div class="ex-name">OYO Nova — Bicep Curl</div>
+        <div class="ex-sets">2 sets · 12–15 reps each arm</div>
+        <div class="ex-cue">Stand on the band, handles at sides, palms facing forward. Curl both handles to shoulder height — keep elbows pinned to your sides, don't let them drift forward. Squeeze at the top, slow on the way down. Can alternate arms for better mind-muscle connection.</div>
+      </div>
+      <div class="ex-tag tag-pull">Pull</div>
+    </div>
+  </div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">03</div>
+      <div class="ex-info">
+        <div class="ex-name">Single-Leg Romanian Deadlift</div>
+        <div class="ex-sets">3 sets · 8 reps each leg · bodyweight · very slow</div>
+        <div class="ex-cue">Stand on one leg, slight bend in the standing knee. Hinge at the hip — let your torso come forward and the free leg extend behind you as a counterbalance. Go until you feel a stretch in the hamstring of the standing leg, then drive through the hip to return upright. Keep your back flat throughout — no rounding. Go slow: 3 seconds down, 1 second hold, 2 seconds up. This is your hip tendon rehab exercise — the hip on the standing leg is doing the work.</div>
+      </div>
+      <div class="ex-tag tag-rehab">Rehab</div>
+    </div>
+    <div class="ex-warning">⚠ Right hip — this is the target side. If you feel sharp pain (not muscle burn) stop immediately. Mild discomfort/tension in the hip tendon area is normal and expected. Start with bodyweight only, no added load.</div>
+  </div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">04</div>
+      <div class="ex-info">
+        <div class="ex-name">Dead Bug</div>
+        <div class="ex-sets">2 sets · 10 reps each side · controlled</div>
+        <div class="ex-cue">Lie on your back, arms pointing straight up at the ceiling, knees bent at 90° in the air (like an upside-down bug). The key: press your lower back FLAT into the floor and keep it there the whole time. Slowly lower your right arm behind your head and left leg toward the floor simultaneously — stop just before they touch. Return to start, switch sides. If your lower back lifts off the floor, you've gone too far. Start small.</div>
+      </div>
+      <div class="ex-tag tag-core">Core</div>
+    </div>
+    <div class="ex-tip">Dead bug looks deceptively easy. The core engagement needed to keep your lower back flat is the entire point — you'll feel it by rep 6.</div>
+  </div>
+</div>
+
+<!-- ══ NOTES ══ -->
+<div class="panel" id="panel-notes">
+
+  <div class="sec-label">Weekly pattern</div>
+  <div class="schedule-grid">
+    <div class="sg-head">Mon</div><div class="sg-head">Tue</div><div class="sg-head">Wed</div><div class="sg-head">Thu</div><div class="sg-head">Fri</div><div class="sg-head">Sat</div><div class="sg-head">Sun</div>
+    <div class="sg-cell day-a"><div class="sg-label">A</div><div class="sg-sub">Push</div></div>
+    <div class="sg-cell rest"><div class="sg-label">—</div><div class="sg-sub">Rest</div></div>
+    <div class="sg-cell day-b"><div class="sg-label">B</div><div class="sg-sub">Pull</div></div>
+    <div class="sg-cell rest"><div class="sg-label">—</div><div class="sg-sub">Rest</div></div>
+    <div class="sg-cell day-a"><div class="sg-label">A</div><div class="sg-sub">Push</div></div>
+    <div class="sg-cell rest"><div class="sg-label">—</div><div class="sg-sub">Rest</div></div>
+    <div class="sg-cell day-b"><div class="sg-label">B</div><div class="sg-sub">Pull</div></div>
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">This is the default pattern. 1 free skip per week — shift everything by a day if needed. Pickup soccer counts as a Day B substitute.</div>
+
+  <div class="sec-label">Progression — first 3 weeks</div>
+
+  <div class="progression-card">
+    <div class="prog-week">Week 1 (Jun 15–21)</div>
+    <div class="prog-detail">
+      Push-ups: 3 × ~30 <span class="prog-arrow">→</span> establish baseline<br>
+      SLRDL: bodyweight only, focus on form and balance<br>
+      Dead bug: small range of motion, get the back-flat feeling<br>
+      Plank: 2 × 30 sec
+    </div>
+  </div>
+
+  <div class="progression-card">
+    <div class="prog-week">Week 2 (Jun 22–28)</div>
+    <div class="prog-detail">
+      Push-ups: push for 35+ in set 1<br>
+      SLRDL: increase range of motion if hip feels good<br>
+      Dead bug: full range, both sides<br>
+      Plank: 2 × 40 sec
+    </div>
+  </div>
+
+  <div class="progression-card">
+    <div class="prog-week">Week 3 (Jun 29–Jul 5)</div>
+    <div class="prog-detail">
+      Push-ups: if hitting 40+ reps, add a 4th set or try diamond push-ups<br>
+      SLRDL: add 1kg hand weight if feeling strong (can of food works)<br>
+      Pull-ups: if bar is installed, attempt first reps — any is great<br>
+      Plank: 2 × 45–60 sec
+    </div>
+  </div>
+
+  <div class="sec-label">Hip tendon guidelines</div>
+
+  <div class="note-card" style="border-color:var(--red)">
+    <div class="note-title" style="color:var(--red)">⚠ What to avoid</div>
+    <div class="note-body">
+      Explosive movements on the right hip — no sprinting or hard kicking until you've built 4+ weeks of consistent SLRDL. The tendon responds to progressive load, not rest. Gradual is the whole point.
+    </div>
+  </div>
+
+  <div class="note-card" style="border-color:var(--amber)">
+    <div class="note-title" style="color:var(--amber)">Pickup soccer</div>
+    <div class="note-body">
+      Fine to play — warm up the hip properly first (leg swings, hip circles, light jogging). Avoid maximal effort kicks for the first 2 weeks. By week 3 if SLRDL is going well, moderate kicks are fine.
+    </div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-title" style="color:var(--light-mid)">What "rehab" actually means here</div>
+    <div class="note-body">
+      Hip tendon issues respond best to eccentric and isometric loading — slow, controlled movements that stress the tendon just enough to promote adaptation. The SLRDL does exactly this. Pain during (mild tension = ok, sharp = stop) and 24–48hr soreness after are both normal. Ongoing pain at rest is not — that's the signal to back off.
+    </div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-title" style="color:var(--light-mid)">OYO Nova tips</div>
+    <div class="note-body">
+      The resistance increases as you extend the cables — so the hardest part of each rep is at full extension. This is actually ideal for most exercises. For curls, stand slightly wider on the band to increase base resistance. For rows, the further you lean back, the harder it gets.
+    </div>
+  </div>
+
+  <div class="sec-label">When equipment arrives</div>
+  <div class="note-card">
+    <div class="note-title" style="color:var(--mid)">Pull-up bar installed</div>
+    <div class="note-body">
+      Start with negatives if you can't do a full pull-up yet: jump to the top position, lower yourself as slowly as possible (aim for 5 seconds). 3 × 3–5 negatives builds the strength fast. Within 2–3 weeks of consistent negatives, full pull-ups follow.
+    </div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-title" style="color:var(--mid)">Planet Fitness</div>
+    <div class="note-body">
+      Cable machine replaces OYO rows with better resistance curve. Lat pulldown machine is a good pull-up progression tool. Don't overthink the gym — the routine above works there too, just swap OYO for cables.
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
