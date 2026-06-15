@@ -245,6 +245,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 .toast.show{transform:translateX(-50%) translateY(0);}
 .reset-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--ff);font-size:11px;padding:6px 12px;border-radius:7px;cursor:pointer;margin-top:18px;transition:all .18s;display:block;}
 .reset-btn:hover{border-color:var(--red);color:var(--red);}
+/* CALENDAR EVENTS */
+.cal-event-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface);border-radius:8px;margin-bottom:5px;}
+.cal-event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cal-event-time{font-family:var(--fm);font-size:10px;color:var(--muted);min-width:52px;}
+.cal-event-title{font-size:12px;font-weight:600;color:var(--lightest);flex:1;}
+.cal-event-cal{font-size:10px;color:var(--muted);}
+.cal-allday-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3px 8px;margin-right:5px;margin-bottom:5px;font-size:11px;color:var(--muted);}
+.cal-allday-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 /* ICONS */
 .pip-star{display:inline-block;width:20px;height:20px;flex-shrink:0;}
 .pip-star.empty{opacity:0.18;}
@@ -409,6 +417,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div class="day-banner-sub">All blocks done. Streak extended. Sleep on time tonight.</div>
   </div>
 
+  <!-- Calendar events -->
+  <div id="calSection" style="margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);">Today</div>
+      <button onclick="fetchCalendarEvents()" id="calRefreshBtn" style="background:none;border:none;color:var(--muted);font-family:var(--fm);font-size:10px;cursor:pointer;padding:2px 6px;">↻ refresh</button>
+    </div>
+    <div id="calEvents" style="font-size:11px;color:var(--muted);font-family:var(--fm);">Tap refresh to load calendar</div>
+  </div>
+
   <div class="sec-label">Morning</div>
   <div class="s-row" id="sb-wake" onclick="toggleBlock('wake')">
     <div class="s-time" id="t-wake">11:00</div><div class="s-dot" style="background:var(--amber)"></div>
@@ -490,7 +507,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 
   <div class="sec-label">Evening</div>
   <div class="s-row" id="sb-dinner" onclick="toggleBlock('dinner')">
-    <div class="s-time">18:30</div><div class="s-dot" style="background:var(--mid)"></div>
+    <div class="s-time" id="t-dinner">—</div><div class="s-dot" style="background:var(--mid)"></div>
     <div class="s-body"><div class="s-name">Dinner</div><div class="s-sub">With Shelby if possible. Evening anchor.</div></div>
     <div class="s-xp">+15</div>
   </div>
@@ -623,6 +640,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div class="q-card" id="q-gr3" onclick="toggleQuest('gr3')"><div class="q-top"><div class="q-left"><div class="q-tag tag-house">Game Room · 3</div><div class="q-name">Shelf overflow sort</div><div class="q-desc">Everything sitting properly, nothing on top of boxes.</div><div class="diff-row" id="dr-gr3"></div></div><div class="q-right"><div class="q-xp">+40 XP</div><div class="q-cb" id="qcb-gr3">✓</div></div></div></div>
     <div class="q-card" id="q-gr4" onclick="toggleQuest('gr4')"><div class="q-top"><div class="q-left"><div class="q-tag tag-house">Game Room · 4</div><div class="q-name">Vacuum + final pass</div><div class="q-desc">Full vacuum, wipe surfaces. The satisfying finish.</div><div class="diff-row" id="dr-gr4"></div></div><div class="q-right"><div class="q-xp">+30 XP</div><div class="q-cb" id="qcb-gr4">✓</div></div></div></div>
     <div class="q-group">Board game listings</div>
+    <div class="q-group">ISS Vanguard · Pack + ship · WWG sale</div>
+    <div class="q-card" id="q-iss1" onclick="toggleQuest('iss1')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">ISS · 1</div><div class="q-name">Locate games + find a box that fits</div><div class="q-desc">Two small boxes. Locating is easy — finding the right box is where it starts. Don't skip the fit check.</div><div class="diff-row" id="dr-iss1"></div></div><div class="q-right"><div class="q-xp">+5 XP</div><div class="q-cb" id="qcb-iss1">✓</div></div></div></div>
+    <div class="q-card" id="q-iss2" onclick="toggleQuest('iss2')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">ISS · 2</div><div class="q-name">Check if box is economical</div><div class="q-desc">Run the shipping estimate. Does the box size make the cost unacceptable? If yes, back to step 1.</div><div class="diff-row" id="dr-iss2"></div></div><div class="q-right"><div class="q-xp">+5 XP</div><div class="q-cb" id="qcb-iss2">✓</div></div></div></div>
+    <div class="q-card" id="q-iss3" onclick="toggleQuest('iss3')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">ISS · 3</div><div class="q-name">Optimise for economical box</div><div class="q-desc">The actual nightmare. Multiple trips up and down stairs. Repack, re-estimate, repeat until the numbers work.</div><div class="q-note">This is the hard one. Put on a podcast.</div><div class="diff-row" id="dr-iss3"></div></div><div class="q-right"><div class="q-xp">+20 XP</div><div class="q-cb" id="qcb-iss3">✓</div></div></div></div>
+    <div class="q-card" id="q-iss4" onclick="toggleQuest('iss4')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">ISS · 4</div><div class="q-name">Print label + pack</div><div class="q-desc">Print the WWG shipping label, pack carefully, seal. Done.</div><div class="diff-row" id="dr-iss4"></div></div><div class="q-right"><div class="q-xp">+10 XP</div><div class="q-cb" id="qcb-iss4">✓</div></div></div></div>
+    <div class="q-card" id="q-iss5" onclick="toggleQuest('iss5')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">ISS · 5</div><div class="q-name">Drop off</div><div class="q-desc">Get it out the door. It's done.</div><div class="diff-row" id="dr-iss5"></div></div><div class="q-right"><div class="q-xp">+10 XP</div><div class="q-cb" id="qcb-iss5">✓</div></div></div></div>
     <div class="q-card" id="q-ebay" onclick="toggleQuest('ebay')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Board Games</div><div class="q-name">List board games on eBay / website</div><div class="q-desc">Photo session first, then list in one sitting. Batch it.</div><div class="diff-row" id="dr-ebay"></div></div><div class="q-right"><div class="q-xp">+60 XP</div><div class="q-cb" id="qcb-ebay">✓</div></div></div></div>
   </div>
 </div>
@@ -826,14 +849,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
   <div class="shift-row"><div class="shift-label">Shift progress</div><div class="shift-val" id="shiftPct">0%</div></div>
   <div class="shift-track"><div class="shift-fill" id="shiftFill" style="width:0%"></div></div>
   <div class="sleep-tip">
-    <div class="sleep-tip-title">5 min earlier per day · blocks shift 30 min weekly</div>
-    <div class="sleep-tip-body">Sleep/wake shift 5 min daily. Everything else snaps 30 min earlier each Monday. Lunch floors at 1:00 PM.</div>
+    <div class="sleep-tip-title">5 min/day + 5 extra every other day · starting 2:30 AM</div>
+    <div class="sleep-tip-body">Bedtime shifts 5 min earlier every day, with an extra 5 min on alternate days (~7.5 min average). 2:30 AM → ~midnight by July 5th. Realistic and sustainable.</div>
   </div>
   <div class="sec-label">Week by week</div>
-  <div class="week-row"><div><div class="week-name">Week 1 (Jun 15–21)</div></div><div style="text-align:right"><div class="week-time">Bed ~1:15 AM · Wake ~10:45 AM</div><div class="week-note">Lock the routine.</div></div></div>
-  <div class="week-row"><div><div class="week-name">Week 2 (Jun 23–29)</div></div><div style="text-align:right"><div class="week-time">Bed ~12:45 AM · Wake ~10:20 AM</div><div class="week-note">You'll feel it. That's it working.</div></div></div>
-  <div class="week-row"><div><div class="week-name">Week 3 (Jun 30–Jul 6)</div></div><div style="text-align:right"><div class="week-time">Bed ~12:10 AM · Wake ~9:55 AM</div><div class="week-note">Evenings start feeling natural.</div></div></div>
-  <div class="week-row"><div><div class="week-name">Jul 6: Go time</div></div><div style="text-align:right"><div class="week-time">Bed ~11:45 PM · Wake 9:00 AM</div><div class="week-note">TerraPower start day.</div></div></div>
+  <div class="week-row"><div><div class="week-name">Week 1 (Jun 15–21)</div></div><div style="text-align:right"><div class="week-time">Bed ~2:10 AM · Wake ~12:00 PM</div><div class="week-note">Start realistic. Lock the routine.</div></div></div>
+  <div class="week-row"><div><div class="week-name">Week 2 (Jun 22–28)</div></div><div style="text-align:right"><div class="week-time">Bed ~1:25 AM · Wake ~11:10 AM</div><div class="week-note">Shift is building. Stick with it.</div></div></div>
+  <div class="week-row"><div><div class="week-name">Week 3 (Jun 29–Jul 5)</div></div><div style="text-align:right"><div class="week-time">Bed ~12:30 AM · Wake ~10:20 AM</div><div class="week-note">Feeling natural now.</div></div></div>
+  <div class="week-row"><div><div class="week-name">Jul 6: Go time</div></div><div style="text-align:right"><div class="week-time">Bed ~midnight · Wake ~9:30 AM</div><div class="week-note">TerraPower start day.</div></div></div>
   <div class="sec-label">What actually helps</div>
   <div class="advice-card" style="border-color:var(--amber)"><div class="advice-title" style="color:var(--amber)">☀️ Morning light within 30 min of waking</div><div class="advice-body">10 min outside resets your clock faster than anything. Cloudy days count.</div></div>
   <div class="advice-card" style="border-color:var(--mid)"><div class="advice-title" style="color:var(--mid)">🎮 Dim screens, don't ban them</div><div class="advice-body">f.lux / Night Shift from 9 PM. You can still play — just dimmer.</div></div>
@@ -863,14 +886,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 <script>
 // ── CONFIG ──
 const SPRINT_START = new Date('2026-06-15T00:00:00');
+
+// Calendar color map by calendar ID
+const CAL_COLORS = {
+  '4':  '#CEE4D8', // naveen.pillai93 — light green
+  '8':  '#CEE4D8', // naveen.pillai93 primary — light green  
+  '9':  '#d95f5f', // crimson-app — red
+  '12': '#4ecdc4', // pillai.naveen2 — teal
+  '1':  '#8CB9A5', // local — neutral mid-green
+};
+const CAL_NAMES = {
+  '4': 'Personal', '8': 'Personal', '9': 'Crimson',
+  '12': 'Work', '1': 'Local'
+};
+// WWG handled by name match since it shares color id with pillai.n2
+
 const SPRINT_END   = new Date('2026-07-05T23:59:59');
-const START_BED_MINS = 90; // 1:30 AM
+const START_BED_MINS = 150; // 2:30 AM
 const SHIFT_PER_DAY = 5;
 const TOTAL_SHIFT_DAYS = 21;
 const XP_PER_LEVEL = 300;
 const KEY = 'np_os_v1';
-const BASE_TIMES = { wake:11*60, morning:11*60+15, tidy:11*60+45, task:12*60, lunch:13*60+30, exercise:14*60+30, free:15*60, wind:22*60 };
-const LUNCH_FLOOR = 13*60;
+const BASE_TIMES = { wake:12*60, morning:12*60+15, tidy:12*60+45, task:13*60, exercise:15*60, free:15*60+30, wind:22*60 };
 
 const BLOCK_XP = { wake:15,morning:15,tidy:15,task:40,gaming:10,lunch:5,exercise:50,free:5,dinner:15,wind:15,gamestop:20,sleep:20 };
 const QUEST_XP = {
@@ -891,7 +928,8 @@ const QUEST_XP = {
   prep_cream_cheese:70, prep_choco_hazel:70,
   // Hinge box
   hinge_box:20,
-  hinge_sort:50
+  hinge_sort:50,
+  iss1:5, iss2:5, iss3:20, iss4:10, iss5:10
 };
 const QUEST_DIFF = {
   appbuild:5,ghpages:3,
@@ -908,7 +946,8 @@ const QUEST_DIFF = {
   pullupbar:2,pf:1,workout:4,soccer:2,
   earphones:0,
   prep_cream_cheese:3.5, prep_choco_hazel:3.5,
-  hinge_box:1, hinge_sort:2
+  hinge_box:1, hinge_sort:2,
+  iss1:2, iss2:2.5, iss3:4, iss4:1.5, iss5:1
 };
 const EARPHONE_UNLOCKS = ['bed1','bed2','bed3','cl1','cl2','cl3'];
 const WEEKEND_BONUS = 30;
@@ -1021,19 +1060,41 @@ function fmtMins(m){
 
 function sleepTarget(){
   const days=daysSince();
-  let bed=START_BED_MINS-days*SHIFT_PER_DAY;
+  // 5 min every day + 5 extra every other day
+  const shift = days*5 + Math.floor(days/2)*5;
+  let bed=START_BED_MINS-shift;
   if(bed<0)bed+=1440;
   const cutoff=bed-30;
-  const wake=BASE_TIMES.wake-days*SHIFT_PER_DAY;
+  const wake=BASE_TIMES.wake-shift;
   return{bed:fmtMins(bed),cutoff:fmtMins(cutoff),wake:fmtMins(wake),days,pct:Math.min(100,Math.round(days/TOTAL_SHIFT_DAYS*100))};
 }
 
+function getDaySchedule(){
+  const days = daysSince();
+  const shift = days*5 + Math.floor(days/2)*5;
+  const wake     = BASE_TIMES.wake - shift;
+  const morning  = wake + 15;
+  const tidy     = wake + 45;
+  const task     = wake + 60;
+  const exercise = wake + 180;
+  const breakfast= wake + 30;
+  const lunch    = breakfast + 4.5*60;
+  const free     = Math.max(exercise + 60, lunch + 30);
+  const dinner   = Math.max(lunch + 4.5*60, 19*60);
+  const bed      = START_BED_MINS - shift;
+  const wind     = bed - 90;
+  const cutoff   = bed - 30;
+  return {wake,morning,tidy,task,exercise,lunch,free,dinner,wind,cutoff,bed};
+}
+
 function schedTime(key){
-  const weeks=weeksSince(),days=daysSince();
-  if(['wake','morning','tidy','task'].includes(key)) return fmtMins(BASE_TIMES[key]-days*SHIFT_PER_DAY);
-  if(key==='lunch') return fmtMins(Math.max(LUNCH_FLOOR,BASE_TIMES.lunch-weeks*30));
-  if(['exercise','free','wind'].includes(key)) return fmtMins(BASE_TIMES[key]-weeks*30);
-  return null;
+  const s = getDaySchedule();
+  const map = {
+    wake:s.wake, morning:s.morning, tidy:s.tidy, task:s.task,
+    exercise:s.exercise, lunch:s.lunch, free:s.free,
+    dinner:s.dinner, wind:s.wind, gamestop:s.cutoff, sleep:s.bed
+  };
+  return map[key] !== undefined ? fmtMins(map[key]) : null;
 }
 
 function questStarsToday(){
@@ -1473,7 +1534,7 @@ function updateUI(){
   document.getElementById('sleepSubText').textContent='Tonight: '+st.bed+' · day '+st.days+' of shift.';
 
   // Schedule times
-  ['wake','morning','tidy','task','lunch','exercise','free','wind'].forEach(k=>{
+  ['wake','morning','tidy','task','lunch','dinner','exercise','free','wind','gamestop','sleep'].forEach(k=>{
     const el=document.getElementById('t-'+k);if(!el)return;
     const t=schedTime(k);if(t)el.textContent=t;
   });
@@ -1815,11 +1876,106 @@ function updateAllRecurringBadges(){
   RECURRING_IDS.forEach(id=>updateRecurringBadge(id));
 }
 
+// ── CALENDAR ──
+let calLoaded = false;
+let showAllDay = false;
+
+async function fetchCalendarEvents() {
+  const container = document.getElementById('calEvents');
+  const btn = document.getElementById('calRefreshBtn');
+  if(!container) return;
+  container.innerHTML = '<span style="color:var(--muted);">Loading...</span>';
+  if(btn) btn.style.opacity = '0.5';
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-US', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const start = new Date(today); start.setHours(0,0,0,0);
+  const end = new Date(today); end.setHours(23,59,59,999);
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system:`You are a calendar assistant. Fetch Google Calendar events for today (${dateStr}) from ALL calendars. 
+Return ONLY a JSON array, no markdown, no explanation.
+Each item: {"title":string,"start":string(time "9:00 AM" or "All day"),"end":string,"calendarId":string,"allDay":boolean,"isHoliday":boolean,"isBirthday":boolean}
+isHoliday/isBirthday true if the event is from a holidays or birthdays calendar, or if the title contains "birthday" or "holiday".`,
+        messages:[{role:'user',content:`Fetch all my Google Calendar events for today ${dateStr} from ${start.toISOString()} to ${end.toISOString()}. JSON array only.`}],
+        mcp_servers:[{type:'url',url:'https://calendarmcp.googleapis.com/mcp/v1',name:'google-calendar'}]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const cleaned = text.replace(/```json|```/g,'').trim();
+    let events = [];
+    try { events = JSON.parse(cleaned); }
+    catch { const m = cleaned.match(/\[[\s\S]*\]/); if(m) events=JSON.parse(m[0]); }
+
+    renderCalEvents(events);
+    calLoaded = true;
+  } catch(e) {
+    container.innerHTML = '<span style="color:var(--muted);font-size:11px;">Could not load calendar</span>';
+    console.error(e);
+  }
+  if(btn) btn.style.opacity = '1';
+}
+
+function renderCalEvents(events) {
+  const container = document.getElementById('calEvents');
+  if(!container) return;
+
+  // Filter birthdays/holidays unless showAllDay toggle is on
+  const filtered = events.filter(e => !e.isHoliday && !e.isBirthday);
+  const timed = filtered.filter(e => !e.allDay).sort((a,b) => a.start.localeCompare(b.start));
+  const allDay = filtered.filter(e => e.allDay);
+
+  if(filtered.length === 0) {
+    container.innerHTML = '<span style="color:var(--muted);font-size:11px;">No events today 🌿</span>';
+    return;
+  }
+
+  let html = '';
+
+  // All-day chips
+  if(allDay.length > 0) {
+    html += '<div style="margin-bottom:8px;display:flex;flex-wrap:wrap;">';
+    allDay.forEach(e => {
+      const color = CAL_COLORS[e.calendarId] || '#8CB9A5';
+      // WWG detection by name
+      const isWWG = e.calendarId === '4' && e.title && e.title.toLowerCase().includes('game');
+      const dotColor = isWWG ? '#1A5A4C' : color;
+      html += `<div class="cal-allday-chip"><div class="cal-allday-dot" style="background:${dotColor}"></div>${e.title}</div>`;
+    });
+    html += '</div>';
+  }
+
+  // Timed events
+  timed.forEach(e => {
+    const isWWG = e.calendarId === '4';
+    const color = isWWG ? '#1A5A4C' : (CAL_COLORS[e.calendarId] || '#8CB9A5');
+    const timeStr = e.end ? `${e.start} – ${e.end}` : e.start;
+    html += `<div class="cal-event-row">
+      <div class="cal-event-dot" style="background:${color}"></div>
+      <div class="cal-event-time">${timeStr}</div>
+      <div class="cal-event-title">${e.title}</div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// Auto-load calendar when schedule tab opens
+
 function switchTab(name,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   el.classList.add('active');
+  if(name==='schedule' && !calLoaded) fetchCalendarEvents();
 }
 
 // Init
@@ -1960,7 +2116,7 @@ function renderQuestPips() {
 const FOLDER_QUESTS = {
   health: ['pullupbar','pf','workout','soccer'],
   meta: ['appbuild','ghpages'],
-  gameroom: ['tb1','tb2','tb3','gr1','gr2','gr3','gr4','ebay'],
+  gameroom: ['tb1','tb2','tb3','gr1','gr2','gr3','gr4','ebay','iss1','iss2','iss3','iss4','iss5'],
   bedroom: ['bed1','bed2','bed3','cl1','cl2','cl3','earphones'],
   boardgames: ['p1','p2','p3','p4','p5','p6','p7'],
   house: ['h1','h2','h3','h4','h5','hinge_box','hinge_sort','lights','wires','cable1','cable2','cable3','fridge1','fridge2','sink1','sink2','sink3'],
@@ -2060,6 +2216,8 @@ function updateFolders() {
 Object.keys(QUEST_DIFF).forEach(id=>renderDiff(id,QUEST_DIFF[id]));
 restoreFolderStates();
 updateUI();
+// Auto-load calendar on first open
+setTimeout(()=>fetchCalendarEvents(), 500);
 </script>
 </body>
 </html>
