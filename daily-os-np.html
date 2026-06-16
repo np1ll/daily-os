@@ -792,6 +792,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
         <div class="diff-row" id="dr-prep_choco_hazel"></div>
       </div><div class="q-right"><div class="q-xp">+70 XP</div><div class="q-cb" id="qcb-prep_choco_hazel">✓</div></div></div>
     </div>
+
+    <div class="q-card" id="q-pills_morning" onclick="toggleRecurring('pills_morning')">
+      <div class="q-top"><div class="q-left">
+        <div class="q-tag tag-house">Recurring · 2w</div>
+        <div class="q-name">Replace morning pills</div>
+        <div class="q-desc">Restock the morning pill organiser. ~2 week supply.</div>
+        <div style="margin-top:6px;">
+          <span id="rbadge-pills_morning" style="display:none;font-family:var(--fm);font-size:9px;background:rgba(92,164,144,.15);color:var(--mid);border:1px solid rgba(92,164,144,.3);border-radius:4px;padding:2px 7px;"></span>
+        </div>
+        <div class="diff-row" id="dr-pills_morning"></div>
+      </div><div class="q-right"><div class="q-xp">+15 XP</div><div class="q-cb" id="qcb-pills_morning">✓</div></div></div>
+    </div>
+
+    <div class="q-card" id="q-pills_evening" onclick="toggleRecurring('pills_evening')">
+      <div class="q-top"><div class="q-left">
+        <div class="q-tag tag-house">Recurring · 1w</div>
+        <div class="q-name">Replace evening pills</div>
+        <div class="q-desc">Restock the evening pill organiser. ~1 week supply.</div>
+        <div style="margin-top:6px;">
+          <span id="rbadge-pills_evening" style="display:none;font-family:var(--fm);font-size:9px;background:rgba(92,164,144,.15);color:var(--mid);border:1px solid rgba(92,164,144,.3);border-radius:4px;padding:2px 7px;"></span>
+        </div>
+        <div class="diff-row" id="dr-pills_evening"></div>
+      </div><div class="q-right"><div class="q-xp">+5 XP</div><div class="q-cb" id="qcb-pills_evening">✓</div></div></div>
+    </div>
   </div>
 </div>
 
@@ -926,6 +950,7 @@ const QUEST_XP = {
   earphones:50,
   // Recurring
   prep_cream_cheese:70, prep_choco_hazel:70,
+  pills_morning:15, pills_evening:5,
   // Hinge box
   hinge_box:20,
   hinge_sort:50,
@@ -946,6 +971,7 @@ const QUEST_DIFF = {
   pullupbar:2,pf:1,workout:4,soccer:2,
   earphones:0,
   prep_cream_cheese:3.5, prep_choco_hazel:3.5,
+  pills_morning:1.5, pills_evening:0.5,
   hinge_box:1, hinge_sort:2,
   iss1:2, iss2:2.5, iss3:4, iss4:1.5, iss5:1
 };
@@ -1014,7 +1040,8 @@ const defState = {
   openedChests:{},
   dayLog:{},
   lastExDay:null, lastExType:null, weekSkips:0, lastSkipWeek:-1,
-  recurringCounts:{}, recurringDayCounts:{} // date -> {blocks:bool, perfect:bool, xp:num, questStars:num, weekendQuests:num}
+  recurringCounts:{}, recurringDayCounts:{},
+  questCompletionDates:{} // date -> {blocks:bool, perfect:bool, xp:num, questStars:num, weekendQuests:num}
 };
 
 let state = load()||{...defState};
@@ -1028,7 +1055,7 @@ if(state.lastDay!==today){
   // Compute carryover from yesterday before wiping blocks
   if(!state.carryoverDate || new Date(state.carryoverDate).toDateString()!==new Date(state.lastDay||'').toDateString()){
     const ystStars=Object.keys(state.quests||{}).reduce((s,id)=>s+(QUEST_DIFF[id]||0),0);
-    if(ystStars>3){ const carry=Math.min(Math.floor((ystStars-3)/2),2); if(carry>0){state.carryoverStars=carry;state.carryoverDate=new Date(state.lastDay||Date.now()).toISOString();} }
+    if(ystStars>3){ const carry=Math.min(Math.floor((ystStars-4)/2),3); if(carry>0){state.carryoverStars=carry;state.carryoverDate=new Date(state.lastDay||Date.now()).toISOString();} }
   }
   state.blocks={};
   state.lastDay=today;
@@ -1098,14 +1125,19 @@ function schedTime(key){
 }
 
 function questStarsToday(){
-  // Regular quests
-  let stars = Object.keys(state.quests).reduce((s,id)=>s+(QUEST_DIFF[id]||0),0);
-  // Recurring quests - count each completion today only
+  const todayStr = getGameDay();
+  let stars = 0;
+  // Regular quests — only count ones completed TODAY
+  Object.keys(state.quests||{}).forEach(id=>{
+    if((state.questCompletionDates||{})[id] === todayStr){
+      stars += (QUEST_DIFF[id]||0);
+    }
+  });
+  // Recurring quests — count each completion today
   if(state.recurringDayCounts){
     RECURRING_IDS.forEach(id=>{
-      const dayKey = getGameDay()+'_'+id;
+      const dayKey = todayStr+'_'+id;
       const count = state.recurringDayCounts[dayKey]||0;
-      // Cap at 5 completions per quest per day for star purposes
       stars += Math.min(count,5)*(QUEST_DIFF[id]||0);
     });
   }
@@ -1122,7 +1154,7 @@ function isPerfectDay(){
   const blocks=req.every(id=>state.blocks[id]);
   const stars=questStarsToday();
   const banked=getBankedStars();
-  return blocks&&(stars+banked)>=3;
+  return blocks&&(stars+banked)>=4;
 }
 
 function getBankedStars(){
@@ -1149,10 +1181,10 @@ function getBankedStars(){
 function computeAndStoreCarryover(){
   // Called at end of day (when perfect day triggers or on new day load)
   const stars = questStarsToday();
-  const goal = 3;
+  const goal = 4;
   if(stars > goal){
-    const surplus = stars - goal;
-    const carry = Math.min(Math.floor(surplus/2), 2);
+    const surplus = stars - 4; // goal=4
+    const carry = Math.min(Math.floor(surplus/2), 3);
     if(carry > 0){
       state.carryoverStars = carry;
       state.carryoverDate = new Date().toISOString();
@@ -1328,20 +1360,19 @@ function starSVG(size, color, opacity) {
 }
 
 function diamondSVG(filled, half) {
-  // half = left side filled, right side outline, clean vertical cut
-  const fillColor = 'var(--mid)';
-  const emptyColor = 'var(--border)';
-  if(filled) {
-    return `<svg width="14" height="14" viewBox="0 0 18 18"><rect x="3" y="3" width="12" height="12" rx="1.5" transform="rotate(45 9 9)" fill="${fillColor}"/></svg>`;
-  } else if(half) {
-    // Left half filled with clean vertical cut using clipPath
-    return `<svg width="14" height="14" viewBox="0 0 18 18">
-      <rect x="3" y="3" width="12" height="12" rx="1.5" transform="rotate(45 9 9)" fill="none" stroke="${fillColor}" stroke-width="1.5"/>
-      <rect x="3" y="3" width="12" height="12" rx="1.5" transform="rotate(45 9 9)" fill="${fillColor}" clip-path="url(#diamond-half)"/>
-      <line x1="9" y1="0" x2="9" y2="18" stroke="var(--surface)" stroke-width="1.5"/>
+  // True diamond shape (rotated square), approach A — vertical clip-path cut
+  const fill = 'var(--mid)';
+  const empty = 'var(--border)';
+  if(filled){
+    return `<svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1 L13 7 L7 13 L1 7 Z" fill="${fill}"/></svg>`;
+  } else if(half){
+    return `<svg width="14" height="14" viewBox="0 0 14 14">
+      <defs><clipPath id="dh"><rect x="0" y="0" width="7" height="14"/></clipPath></defs>
+      <path d="M7 1 L13 7 L7 13 L1 7 Z" fill="none" stroke="${fill}" stroke-width="1.2"/>
+      <path d="M7 1 L13 7 L7 13 L1 7 Z" fill="${fill}" clip-path="url(#dh)"/>
     </svg>`;
   } else {
-    return `<svg width="14" height="14" viewBox="0 0 18 18"><rect x="3" y="3" width="12" height="12" rx="1.5" transform="rotate(45 9 9)" fill="none" stroke="${emptyColor}" stroke-width="1.5"/></svg>`;
+    return `<svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1 L13 7 L7 13 L1 7 Z" fill="none" stroke="${empty}" stroke-width="1.2"/></svg>`;
   }
 }
 
@@ -1646,6 +1677,8 @@ function toggleQuest(id){
     showToast('↩ Quest unmarked');
   } else {
     state.quests[id]=true;state.xp+=xp+bonus;
+    if(!state.questCompletionDates) state.questCompletionDates={};
+    state.questCompletionDates[id]=getGameDay();
     if(id==='earphones') showLootToast('🎧 FOUND THEM! +50 XP');
     else if(bonus>0) showToast('+'+xp+' XP + '+bonus+' weekend bonus 🌿');
     else showToast('Quest done! +'+xp+' XP 🌿');
@@ -1704,12 +1737,14 @@ function confirmXpReset(){
   // Save full state snapshot for revert
   state.lastXP = state.xp;
   state.lastQuests = JSON.stringify(state.quests||{});
+  state.lastQuestDates = JSON.stringify(state.questCompletionDates||{});
   state.lastRecurringCounts = JSON.stringify(state.recurringCounts||{});
   state.lastRecurringDayCounts = JSON.stringify(state.recurringDayCounts||{});
   state.lastStarCount = state.starCount||0;
   // Wipe everything
   state.xp = 0;
   state.quests = {};
+  state.questCompletionDates = {};
   state.recurringCounts = {};
   state.recurringDayCounts = {};
   state.starCount = 0;
@@ -1734,6 +1769,7 @@ function revertXp(){
   if(state.lastXP === undefined){ showToast('Nothing to revert — no XP saved'); return; }
   state.xp = state.lastXP;
   if(state.lastQuests) state.quests = JSON.parse(state.lastQuests);
+  if(state.lastQuestDates) state.questCompletionDates = JSON.parse(state.lastQuestDates);
   if(state.lastRecurringCounts) state.recurringCounts = JSON.parse(state.lastRecurringCounts);
   if(state.lastRecurringDayCounts) state.recurringDayCounts = JSON.parse(state.lastRecurringDayCounts);
   if(state.lastStarCount !== undefined) state.starCount = state.lastStarCount;
@@ -1821,7 +1857,7 @@ function resetXP(){
 }
 
 // ── RECURRING QUESTS ──
-const RECURRING_IDS = ['prep_cream_cheese','prep_choco_hazel'];
+const RECURRING_IDS = ['prep_cream_cheese','prep_choco_hazel','pills_morning','pills_evening'];
 
 function toggleRecurring(id){
   if(!state.recurringCounts) state.recurringCounts={};
@@ -2072,7 +2108,7 @@ function renderPerfectPips() {
 function renderQuestPips() {
   const el = document.getElementById('questPipRow'); if(!el) return;
   const stars = questStarsToday() + getBankedStars();
-  const goal = 3;
+  const goal = 4;
   let h = '';
 
   if(stars > 10) {
