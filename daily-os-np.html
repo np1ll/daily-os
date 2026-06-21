@@ -18,6 +18,7 @@
   --ff:'DM Sans',sans-serif;--fm:'DM Mono',monospace;--fd:'DM Serif Display',serif;
 }
 @media (prefers-color-scheme: light) {
+  .cal-star-silver{color:#3E5C66 !important;text-shadow:0 0 2px rgba(255,255,255,.8);}
   :root {
     --bg:#f0f7f4;--surface:#ffffff;--surface2:#e8f4ef;--border:#c2ddd4;--text:#1A5A4C;--muted:#5a8870;
     --lightest:#1A5A4C;--light:#3E887B;--light-mid:#3E887B;--mid:#1A5A4C;--mid-dark:#0E4A3E;
@@ -79,17 +80,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 .cal-dow{font-family:var(--fm);font-size:9px;color:var(--muted);text-align:center;padding:4px 0;text-transform:uppercase;letter-spacing:.08em;}
 .cal-day{aspect-ratio:1;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;position:relative;font-size:12px;font-weight:600;}
 .cal-day.inactive{opacity:.25;cursor:default;background:transparent;border-color:transparent;}
-.cal-day.today{border-color:var(--mid);background:var(--surface2);}
+.cal-day.today{box-shadow:0 0 0 1px var(--mid);border-color:var(--mid);}
+.cal-day.today:not(.perfect):not(.complete):not(.weekend-done){background:var(--surface2);}
 .cal-day.today .cal-num{color:var(--mid);}
 .cal-day.perfect{background:linear-gradient(135deg,var(--dark),var(--darker));border-color:var(--mid-dark);}
 .cal-day.perfect .cal-num{color:var(--lightest);}
 .cal-day.complete{background:var(--surface2);border-color:var(--border);}
 .cal-day.weekend-done{background:rgba(200,220,210,.08);border-color:rgba(200,220,210,.35);}
+.cal-star-silver{position:absolute;top:3px;left:3px;font-size:10px;line-height:1;color:#C8D4DA;}
 .cal-day.future{opacity:.4;cursor:default;}
 .cal-day.start-day{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber);}
 .cal-day.end-day{border-color:var(--red);box-shadow:0 0 0 1px var(--red);}
 .cal-num{font-family:var(--fm);font-size:11px;color:var(--text);line-height:1;}
-.cal-star{font-size:8px;line-height:1;margin-top:1px;}
+.cal-star{position:absolute;top:3px;right:3px;font-size:10px;line-height:1;color:var(--gold,#c9a84c);}
 .cal-dots{display:flex;gap:2px;margin-top:2px;justify-content:center;}
 .cal-dot{width:4px;height:4px;border-radius:50%;}
 .cal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
@@ -283,6 +286,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 }
 .loot-burst{position:fixed;z-index:499;pointer-events:none;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.4),transparent 70%);animation:burst .6s ease-out forwards;}
 @keyframes burst{0%{transform:scale(0);opacity:1;}100%{transform:scale(2.5);opacity:0;}}
+/* SUB-BLOCKS (morning routine breakdown) */
+.sub-block-list{display:flex;flex-direction:column;gap:6px;}
+.sub-item{display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface2);border-radius:8px;cursor:pointer;transition:background .15s;}
+.sub-item:hover{background:var(--surface);}
+.sub-item.done{background:rgba(92,164,144,.12);}
+.sub-cb{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;flex-shrink:0;}
+.sub-item.done .sub-cb{background:var(--mid-dark);border-color:var(--mid-dark);color:var(--lightest);}
+.sub-name{font-size:12px;color:var(--text);flex:1;}
+.sub-item.done .sub-name{color:var(--muted);text-decoration:line-through;}
+.sub-xp{font-family:var(--fm);font-size:11px;color:var(--mid);}
 /* EXERCISE BLOCK */
 .ex-day-toggle{display:flex;gap:6px;margin-top:8px;}
 .ex-day-btn{flex:1;padding:6px 4px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--fm);font-size:10px;text-align:center;cursor:pointer;transition:all .18s;}
@@ -427,20 +440,60 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
   </div>
 
   <div class="sec-label">Morning</div>
-  <div class="s-row" id="sb-wake" onclick="toggleBlock('wake')">
-    <div class="s-time" id="t-wake">11:00</div><div class="s-dot" style="background:var(--amber)"></div>
-    <div class="s-body"><div class="s-name">Wake up + light</div><div class="s-sub">10 min outside or blinds open. No phone in bed.</div></div>
-    <div class="s-xp">+15</div>
+  <!-- Wake + Go Outside (collapsible, partial XP) -->
+  <div class="s-row" id="sb-wake" style="flex-direction:column;align-items:stretch;cursor:default;">
+    <div style="display:flex;align-items:flex-start;gap:11px;cursor:pointer;" onclick="toggleSubBlockGroup('wake')">
+      <div class="s-time" id="t-wake">11:00</div><div class="s-dot" style="background:var(--amber);margin-top:5px;flex-shrink:0;"></div>
+      <div class="s-body"><div class="s-name">Wake + go outside</div><div class="s-sub" id="wake-sub">Tap to expand · partial XP</div></div>
+      <div class="s-xp" id="wake-xp-total">+25</div>
+    </div>
+    <div class="sub-block-list" id="wake-sublist" style="display:none;margin-top:8px;padding-left:30px;">
+      <div class="sub-item" onclick="toggleSubItem('wake_on_time')">
+        <div class="sub-cb" id="subcb-wake_on_time">✓</div>
+        <div class="sub-name">Wake on time</div>
+        <div class="sub-xp">+15</div>
+      </div>
+      <div class="sub-item" onclick="toggleSubItem('go_outside')">
+        <div class="sub-cb" id="subcb-go_outside">✓</div>
+        <div class="sub-name">Go outside</div>
+        <div class="sub-xp">+10</div>
+      </div>
+    </div>
   </div>
-  <div class="s-row" id="sb-morning" onclick="toggleBlock('morning')">
-    <div class="s-time" id="t-morning">11:15</div><div class="s-dot" style="background:var(--mid)"></div>
-    <div class="s-body"><div class="s-name">Morning routine</div><div class="s-sub">Coffee, breakfast, get dressed. Dressed = day mode.</div></div>
-    <div class="s-xp">+15</div>
+
+  <!-- Morning routine (collapsible, partial XP) -->
+  <div class="s-row" id="sb-morning" style="flex-direction:column;align-items:stretch;cursor:default;">
+    <div style="display:flex;align-items:flex-start;gap:11px;cursor:pointer;" onclick="toggleSubBlockGroup('morning')">
+      <div class="s-time" id="t-morning">11:15</div><div class="s-dot" style="background:var(--mid);margin-top:5px;flex-shrink:0;"></div>
+      <div class="s-body"><div class="s-name">Morning routine</div><div class="s-sub" id="morning-sub">Tap to expand · partial XP</div></div>
+      <div class="s-xp" id="morning-xp-total">+15</div>
+    </div>
+    <div class="sub-block-list" id="morning-sublist" style="display:none;margin-top:8px;padding-left:30px;">
+      <div class="sub-item" onclick="toggleSubItem('breakfast')">
+        <div class="sub-cb" id="subcb-breakfast">✓</div>
+        <div class="sub-name">Breakfast</div>
+        <div class="sub-xp">+5</div>
+      </div>
+      <div class="sub-item" onclick="toggleSubItem('get_dressed')">
+        <div class="sub-cb" id="subcb-get_dressed">✓</div>
+        <div class="sub-name">Get dressed</div>
+        <div class="sub-xp">+10</div>
+      </div>
+    </div>
   </div>
-  <div class="s-row" id="sb-tidy" onclick="toggleBlock('tidy')">
-    <div class="s-time" id="t-tidy">11:45</div><div class="s-dot" style="background:var(--light-mid)"></div>
-    <div class="s-body"><div class="s-name">Kitchen + downstairs tidy</div><div class="s-sub">15–20 min. Opening ceremony.</div></div>
-    <div class="s-xp">+15</div>
+
+  <!-- Downstairs tidy (3-button selector) -->
+  <div class="s-row" id="sb-tidy" style="flex-direction:column;align-items:stretch;cursor:default;">
+    <div style="display:flex;align-items:flex-start;gap:11px;">
+      <div class="s-time" id="t-tidy">11:45</div><div class="s-dot" style="background:var(--light-mid);margin-top:5px;flex-shrink:0;"></div>
+      <div class="s-body"><div class="s-name">Kitchen + downstairs tidy</div><div class="s-sub" id="tidy-sub">Pick how messy it was</div></div>
+      <div class="s-xp" id="tidy-xp-display">+10–25</div>
+    </div>
+    <div class="ex-day-toggle">
+      <div class="ex-day-btn" id="tidy-btn-normal" onclick="selectTidyLevel('normal')">Normal · +10</div>
+      <div class="ex-day-btn" id="tidy-btn-messy" onclick="selectTidyLevel('messy')">Messy · +15</div>
+      <div class="ex-day-btn" id="tidy-btn-disaster" onclick="selectTidyLevel('disaster')">Disaster · +25</div>
+    </div>
   </div>
   <div class="s-row" id="sb-task" onclick="toggleBlock('task')">
     <div class="s-time" id="t-task">12:00</div><div class="s-dot" style="background:var(--mid-dark)"></div>
@@ -575,7 +628,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div class="folder-emoji">💪</div>
     <div class="folder-info">
       <div class="folder-title">Health</div>
-      <div class="folder-meta" id="fmeta-health">Pull-up bar · Planet Fitness · Workout · Pickup soccer</div>
+      <div class="folder-meta" id="fmeta-health">Pull-up bar · Planet Fitness · Workout</div>
     </div>
     <div class="folder-right">
       <div class="folder-xp" id="fxp-health"></div>
@@ -588,7 +641,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div class="q-card" id="q-pullupbar" onclick="toggleQuest('pullupbar')"><div class="q-top"><div class="q-left"><div class="q-tag tag-house">Health</div><div class="q-name">Research + buy pull-up bar</div><div class="q-desc">Iron Gym or Garagefit, ~$35–50. Standard doorframes are fine at 145 lbs. Store on a hook in the closet when not in use. Just pull the trigger.</div><div class="diff-row" id="dr-pullupbar"></div></div><div class="q-right"><div class="q-xp">+30 XP</div><div class="q-cb" id="qcb-pullupbar">✓</div></div></div></div>
     <div class="q-card" id="q-pf" onclick="toggleQuest('pf')"><div class="q-top"><div class="q-left"><div class="q-tag tag-house">Health</div><div class="q-name">Join Planet Fitness</div><div class="q-desc">$10/month basic tier. Cable machine, proper bench, pull-up bar, more variety. There's one nearby — just go sign up.</div><div class="diff-row" id="dr-pf"></div></div><div class="q-right"><div class="q-xp">+20 XP</div><div class="q-cb" id="qcb-pf">✓</div></div></div></div>
     <div class="q-card" id="q-workout" onclick="toggleQuest('workout')"><div class="q-top"><div class="q-left"><div class="q-tag tag-meta">Health · Boss</div><div class="q-name">Build + lock in workout routine</div><div class="q-desc">Day A (Push + Core): push-ups, OYO chest/shoulders, leg raises, plank. Day B (Pull + Rehab): pull-ups/rows, OYO curls, single-leg RDL, dead bug. Every other day, 30–35 min. 1 free skip/week. Tap when the routine feels real.</div><div class="diff-row" id="dr-workout"></div></div><div class="q-right"><div class="q-xp">+80 XP</div><div class="q-cb" id="qcb-workout">✓</div></div></div></div>
-    <div class="q-card" id="q-soccer" onclick="toggleQuest('soccer')"><div class="q-top"><div class="q-left"><div class="q-tag tag-house">Health</div><div class="q-name">Pickup soccer session</div><div class="q-desc">Counts as a Day B substitute if you go. Respect the hip on hard kicks — warm up properly. Durham/Triangle area has options.</div><div class="diff-row" id="dr-soccer"></div></div><div class="q-right"><div class="q-xp">+30 XP</div><div class="q-cb" id="qcb-soccer">✓</div></div></div></div>
   </div>
 </div>
 
@@ -816,6 +868,42 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
         <div class="diff-row" id="dr-pills_evening"></div>
       </div><div class="q-right"><div class="q-xp">+5 XP</div><div class="q-cb" id="qcb-pills_evening">✓</div></div></div>
     </div>
+
+    <div class="q-card" id="q-football" onclick="toggleRecurring('football')">
+      <div class="q-top"><div class="q-left">
+        <div class="q-tag tag-house">Recurring · Tue/Thu</div>
+        <div class="q-name">Football session</div>
+        <div class="q-desc">Counts as a Day B substitute. Respect the hip on hard kicks — warm up properly first.</div>
+        <div style="margin-top:6px;">
+          <span id="rbadge-football" style="display:none;font-family:var(--fm);font-size:9px;background:rgba(92,164,144,.15);color:var(--mid);border:1px solid rgba(92,164,144,.3);border-radius:4px;padding:2px 7px;"></span>
+        </div>
+        <div class="diff-row" id="dr-football"></div>
+      </div><div class="q-right"><div class="q-xp">+30 XP</div><div class="q-cb" id="qcb-football">✓</div></div></div>
+    </div>
+
+    <div class="q-card" id="q-app_update_simple" onclick="toggleRecurring('app_update_simple')">
+      <div class="q-top"><div class="q-left">
+        <div class="q-tag tag-meta">Recurring · Dev</div>
+        <div class="q-name">Daily OS — simple update</div>
+        <div class="q-desc">Content tweaks, copy changes, small additions. Quick to ship.</div>
+        <div style="margin-top:6px;">
+          <span id="rbadge-app_update_simple" style="display:none;font-family:var(--fm);font-size:9px;background:rgba(92,164,144,.15);color:var(--mid);border:1px solid rgba(92,164,144,.3);border-radius:4px;padding:2px 7px;"></span>
+        </div>
+        <div class="diff-row" id="dr-app_update_simple"></div>
+      </div><div class="q-right"><div class="q-xp">+5 XP</div><div class="q-cb" id="qcb-app_update_simple">✓</div></div></div>
+    </div>
+
+    <div class="q-card" id="q-app_update_bugfix" onclick="toggleRecurring('app_update_bugfix')">
+      <div class="q-top"><div class="q-left">
+        <div class="q-tag tag-meta">Recurring · Dev</div>
+        <div class="q-name">Daily OS — bugfix / feature</div>
+        <div class="q-desc">Actual debugging, new feature builds, logic fixes. The real dev work.</div>
+        <div style="margin-top:6px;">
+          <span id="rbadge-app_update_bugfix" style="display:none;font-family:var(--fm);font-size:9px;background:rgba(92,164,144,.15);color:var(--mid);border:1px solid rgba(92,164,144,.3);border-radius:4px;padding:2px 7px;"></span>
+        </div>
+        <div class="diff-row" id="dr-app_update_bugfix"></div>
+      </div><div class="q-right"><div class="q-xp">+15 XP</div><div class="q-cb" id="qcb-app_update_bugfix">✓</div></div></div>
+    </div>
   </div>
 </div>
 
@@ -946,11 +1034,13 @@ const QUEST_XP = {
   fridge1:10,fridge2:75,
   sink1:20,sink2:30,sink3:20,
   cable1:20,cable2:5,cable3:60,
-  pullupbar:30,pf:20,workout:80,soccer:30,
+  pullupbar:30,pf:20,workout:80,
   earphones:50,
   // Recurring
   prep_cream_cheese:70, prep_choco_hazel:70,
   pills_morning:15, pills_evening:5,
+  football:30,
+  app_update_simple:5, app_update_bugfix:15,
   // Hinge box
   hinge_box:20,
   hinge_sort:50,
@@ -968,10 +1058,12 @@ const QUEST_DIFF = {
   fridge1:1,fridge2:2,
   sink1:1,sink2:2,sink3:1,
   cable1:2,cable2:0,cable3:3,
-  pullupbar:2,pf:1,workout:4,soccer:2,
+  pullupbar:2,pf:1,workout:4,
   earphones:0,
   prep_cream_cheese:3.5, prep_choco_hazel:3.5,
   pills_morning:1.5, pills_evening:0.5,
+  football:2,
+  app_update_simple:0.5, app_update_bugfix:1,
   hinge_box:1, hinge_sort:2,
   iss1:2, iss2:2.5, iss3:4, iss4:1.5, iss5:1
 };
@@ -1041,7 +1133,8 @@ const defState = {
   dayLog:{},
   lastExDay:null, lastExType:null, weekSkips:0, lastSkipWeek:-1,
   recurringCounts:{}, recurringDayCounts:{},
-  questCompletionDates:{} // date -> {blocks:bool, perfect:bool, xp:num, questStars:num, weekendQuests:num}
+  questCompletionDates:{},
+  subItems:{}, tidyLevel:null // date -> {blocks:bool, perfect:bool, xp:num, questStars:num, weekendQuests:num}
 };
 
 let state = load()||{...defState};
@@ -1175,7 +1268,7 @@ function getBankedStars(){
     if(dayDiff === 1) banked += state.carryoverStars; // only valid next day
   }
 
-  return Math.min(banked, 2); // global cap at 2
+  return Math.min(banked, 3); // global cap at 3 (goal-1)
 }
 
 function computeAndStoreCarryover(){
@@ -1234,13 +1327,21 @@ function buildCalendar(){
     const el=document.createElement('div');
     el.className='cal-day';
 
-    if(!inSprint&&!isToday){el.classList.add('inactive');}
-    else if(isFuture&&!isToday){el.classList.add('future');}
-    else if(isToday){el.classList.add('today');}
-    else if(log){
-      if(log.perfect) el.classList.add('perfect');
-      else if(log.blocks) el.classList.add('complete');
-      else if(isWeekendDay&&log.weekendQuests) el.classList.add('weekend-done');
+    // Base state classes can now STACK with today/future
+    if(!inSprint&&!isToday){
+      el.classList.add('inactive');
+    } else if(isFuture&&!isToday){
+      el.classList.add('future');
+    } else {
+      // Past or today — check log for perfect/complete/weekend status
+      const hadWeekendQuest = isWeekendDay && log && log.weekendQuests > 0;
+      if(log){
+        if(log.perfect) el.classList.add('perfect');
+        else if(log.blocks) el.classList.add('complete');
+        else if(hadWeekendQuest) el.classList.add('weekend-done');
+      }
+      // Today ring stacks ON TOP of whatever else applies
+      if(isToday) el.classList.add('today');
     }
 
     // Special markers
@@ -1249,9 +1350,13 @@ function buildCalendar(){
 
     const num=document.createElement('div');num.className='cal-num';num.textContent=d.getDate();el.appendChild(num);
 
-    // Star for perfect days
+    // Gold star for perfect days (top-right)
     if(log&&log.perfect){
       const star=document.createElement('div');star.className='cal-star';star.textContent='★';el.appendChild(star);
+    }
+    // Silver star for weekend quest completion (top-left) — stacks with gold star
+    if(log&&isWeekendDay&&log.weekendQuests>0){
+      const sstar=document.createElement('div');sstar.className='cal-star-silver';sstar.textContent='✦';el.appendChild(sstar);
     }
 
     // Dots for quest stars
@@ -1334,7 +1439,7 @@ function checkPerfectDay(){
   const loot=DAILY_LOOT[Math.floor(Math.random()*DAILY_LOOT.length)];
   state.pendingLoot=(state.pendingLoot||0)+loot;
   state.lootTotal=(state.lootTotal||0)+loot;
-  logDay();save();
+  logDay();save();updateUI();
   showLootToast('Perfect Day! 🌟 +$'+loot+' gaming dollars — reroll available', true);
 }
 
@@ -1622,6 +1727,8 @@ function updateUI(){
   updateExBlock();
   renderPerfectPips();
   renderQuestPips();
+  restoreSubItemStates();
+  updateTidyDisplay();
   updateAllRecurringBadges();
   if(document.getElementById("debugPanel")?.style.display!=="none") updateDebug();
 }
@@ -1693,7 +1800,23 @@ function toggleQuest(id){
 }
 
 function resetDay(){
-  Object.keys(BLOCK_XP).forEach(id=>{if(state.blocks[id])state.xp=Math.max(0,state.xp-BLOCK_XP[id]);});
+  // Reverse normal blocks (excluding wake/morning/tidy which are now sub-item driven)
+  Object.keys(BLOCK_XP).forEach(id=>{
+    if(['wake','morning','tidy'].includes(id)) return;
+    if(state.blocks[id]) state.xp=Math.max(0,state.xp-BLOCK_XP[id]);
+  });
+  // Reverse sub-item XP
+  if(state.subItems){
+    Object.keys(state.subItems).forEach(id=>{
+      if(state.subItems[id] && SUB_ITEMS[id]) state.xp=Math.max(0,state.xp-SUB_ITEMS[id].xp);
+    });
+  }
+  state.subItems={};
+  // Reverse tidy XP
+  if(state.tidyLevel && state.blocks['tidy']){
+    state.xp=Math.max(0,state.xp-(TIDY_XP[state.tidyLevel]||0));
+  }
+  state.tidyLevel=null;
   state.blocks={};save();updateUI();showToast('Day reset');
 }
 
@@ -1756,6 +1879,8 @@ function confirmXpReset(){
   state.weekendStarsBank = 0;
   state.weekendBankDate = null;
   state.recurringTicked = {};
+  state.subItems = {};
+  state.tidyLevel = null;
   document.getElementById('mathChallenge').style.display='none';
   save(); updateUI(); updateDebug();
   showToast('Full reset done — tap Revert to undo');
@@ -1857,7 +1982,7 @@ function resetXP(){
 }
 
 // ── RECURRING QUESTS ──
-const RECURRING_IDS = ['prep_cream_cheese','prep_choco_hazel','pills_morning','pills_evening'];
+const RECURRING_IDS = ['prep_cream_cheese','prep_choco_hazel','pills_morning','pills_evening','football','app_update_simple','app_update_bugfix'];
 
 function toggleRecurring(id){
   if(!state.recurringCounts) state.recurringCounts={};
@@ -2016,6 +2141,129 @@ function switchTab(name,el){
 
 // Init
 
+// ── MORNING SUB-BLOCKS ──
+const SUB_ITEMS = {
+  wake_on_time: {xp:15, parent:'wake', blockId:'wake'},
+  go_outside:   {xp:10, parent:'wake', blockId:'wake'},
+  breakfast:    {xp:5,  parent:'morning', blockId:'morning'},
+  get_dressed:  {xp:10, parent:'morning', blockId:'morning'}
+};
+const SUB_GROUPS = {
+  wake: ['wake_on_time','go_outside'],
+  morning: ['breakfast','get_dressed']
+};
+
+function toggleSubBlockGroup(group){
+  const list = document.getElementById(group+'-sublist');
+  if(!list) return;
+  list.style.display = list.style.display === 'none' ? 'flex' : 'none';
+  if(list.style.display === 'flex') list.style.flexDirection = 'column';
+}
+
+function toggleSubItem(id){
+  if(!state.subItems) state.subItems = {};
+  const item = SUB_ITEMS[id];
+  if(!item) return;
+
+  const wasDone = !!state.subItems[id];
+  state.subItems[id] = !wasDone;
+
+  if(!wasDone){
+    state.xp += item.xp;
+    showToast('+'+item.xp+' XP ⚡');
+  } else {
+    state.xp = Math.max(0, state.xp - item.xp);
+  }
+
+  updateSubGroupState(item.parent);
+  save(); updateUI();
+}
+
+function updateSubGroupState(group){
+  const ids = SUB_GROUPS[group];
+  if(!ids) return;
+  const allDone = ids.every(id => state.subItems && state.subItems[id]);
+  const anyDone = ids.some(id => state.subItems && state.subItems[id]);
+
+  // Sync the parent block's "done" state with sub-completion
+  state.blocks[group] = allDone;
+
+  // Update sub-item checkboxes
+  ids.forEach(id=>{
+    const cb = document.getElementById('subcb-'+id);
+    const row = cb ? cb.closest('.sub-item') : null;
+    const done = state.subItems && state.subItems[id];
+    if(row) row.classList.toggle('done', !!done);
+  });
+
+  // Update parent row visual + subtitle XP earned so far
+  const earnedXp = ids.reduce((s,id)=> s + (state.subItems&&state.subItems[id] ? SUB_ITEMS[id].xp : 0), 0);
+  const totalXp = ids.reduce((s,id)=> s + SUB_ITEMS[id].xp, 0);
+  const subEl = document.getElementById(group+'-sub');
+  if(subEl){
+    subEl.textContent = anyDone ? `${earnedXp} / ${totalXp} XP earned` : 'Tap to expand · partial XP';
+  }
+  const row = document.getElementById('sb-'+group);
+  if(row) row.classList.toggle('done', allDone);
+
+  if(allDone) checkPerfectDay();
+}
+
+function restoreSubItemStates(){
+  Object.keys(SUB_ITEMS).forEach(id=>{
+    const done = state.subItems && state.subItems[id];
+    const cb = document.getElementById('subcb-'+id);
+    const row = cb ? cb.closest('.sub-item') : null;
+    if(row) row.classList.toggle('done', !!done);
+  });
+  Object.keys(SUB_GROUPS).forEach(group=>{
+    const ids = SUB_GROUPS[group];
+    const anyDone = ids.some(id=>state.subItems && state.subItems[id]);
+    const earnedXp = ids.reduce((s,id)=> s + (state.subItems&&state.subItems[id] ? SUB_ITEMS[id].xp : 0), 0);
+    const totalXp = ids.reduce((s,id)=> s + SUB_ITEMS[id].xp, 0);
+    const subEl = document.getElementById(group+'-sub');
+    if(subEl) subEl.textContent = anyDone ? `${earnedXp} / ${totalXp} XP earned` : 'Tap to expand · partial XP';
+  });
+}
+
+// ── DOWNSTAIRS TIDY (3-button) ──
+const TIDY_XP = {normal:10, messy:15, disaster:25};
+
+function selectTidyLevel(level){
+  const wasSelected = state.tidyLevel === level;
+  ['normal','messy','disaster'].forEach(l=>{
+    const btn = document.getElementById('tidy-btn-'+l);
+    if(btn) btn.classList.remove('selected');
+  });
+
+  if(wasSelected){
+    // Deselect — undo XP
+    state.xp = Math.max(0, state.xp - (TIDY_XP[state.tidyLevel]||0));
+    state.tidyLevel = null;
+    state.blocks['tidy'] = false;
+  } else {
+    // Remove old XP if switching levels same day
+    if(state.tidyLevel && state.blocks['tidy']){
+      state.xp = Math.max(0, state.xp - (TIDY_XP[state.tidyLevel]||0));
+    }
+    state.tidyLevel = level;
+    state.xp += TIDY_XP[level];
+    state.blocks['tidy'] = true;
+    showToast('+'+TIDY_XP[level]+' XP ⚡');
+    const btn = document.getElementById('tidy-btn-'+level);
+    if(btn) btn.classList.add('selected');
+  }
+
+  save(); updateUI(); checkPerfectDay();
+}
+
+function updateTidyDisplay(){
+  ['normal','messy','disaster'].forEach(l=>{
+    const btn = document.getElementById('tidy-btn-'+l);
+    if(btn) btn.classList.toggle('selected', state.tidyLevel === l && state.blocks['tidy']);
+  });
+}
+
 // ── EXERCISE DAY ──
 const DAY_A_DESC = 'Push-ups 3×failure · OYO chest/shoulder 2× · Leg raises 3×15 · Plank 2×45s';
 const DAY_B_DESC = 'Pull-ups/rows 3× · OYO curls 2× · Single-leg RDL 3×8 · Dead bug 2×10';
@@ -2150,13 +2398,13 @@ function renderQuestPips() {
 
 // ── FOLDERS ──
 const FOLDER_QUESTS = {
-  health: ['pullupbar','pf','workout','soccer'],
+  health: ['pullupbar','pf','workout'],
   meta: ['appbuild','ghpages'],
   gameroom: ['tb1','tb2','tb3','gr1','gr2','gr3','gr4','ebay','iss1','iss2','iss3','iss4','iss5'],
   bedroom: ['bed1','bed2','bed3','cl1','cl2','cl3','earphones'],
   boardgames: ['p1','p2','p3','p4','p5','p6','p7'],
   house: ['h1','h2','h3','h4','h5','hinge_box','hinge_sort','lights','wires','cable1','cable2','cable3','fridge1','fridge2','sink1','sink2','sink3'],
-  recurring: ['prep_cream_cheese','prep_choco_hazel']
+  recurring: ['prep_cream_cheese','prep_choco_hazel','football','app_update_simple','app_update_bugfix']
 };
 
 function toggleFolder(id) {
@@ -2195,8 +2443,8 @@ function updateFolders() {
       bedroom: '3 bedroom zones · 3 closet zones · earphones',
       boardgames: 'Primal salvage · 7 steps',
       house: 'Hinges · lights · wires · cables · fridge · sink',
-      health: 'Pull-up bar · Planet Fitness · Workout · Pickup soccer',
-      recurring: 'Prep tasks · repeatable · earn XP each time'
+      health: 'Pull-up bar · Planet Fitness · Workout',
+      recurring: 'Prep tasks · pills · football · earn XP each time'
     };
 
     if(isRecurringFolder){
