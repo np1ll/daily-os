@@ -1303,7 +1303,7 @@ function buildCalendar(){
   });
   // June 2026: starts on Monday (day 1)
   // We show Jun 1 - Jul 5
-  const startMonth=new Date('2026-06-01');
+  const startMonth=new Date(2026,5,1); // June 1, 2026 — local time, month is 0-indexed
   const startDow=startMonth.getDay(); // 1 = Monday
   // Fill empty cells before Jun 1
   for(let i=0;i<startDow;i++){
@@ -1314,11 +1314,14 @@ function buildCalendar(){
   const todayDate=new Date();
   todayDate.setHours(0,0,0,0);
 
+  const sprintStartDate=new Date(2026,5,15); // June 15, local time
+  const sprintEndDate=new Date(2026,6,5); // July 5, local time
+
   for(let i=0;i<totalDays;i++){
-    const d=new Date('2026-06-01');d.setDate(1+i);
+    const d=new Date(2026,5,1); d.setDate(1+i); // local time throughout
     d.setHours(0,0,0,0);
     const dateStr=d.toDateString();
-    const inSprint=d>=new Date('2026-06-15')&&d<=new Date('2026-07-05');
+    const inSprint=d>=sprintStartDate&&d<=sprintEndDate;
     const isToday=dateStr===todayDate.toDateString();
     const isFuture=d>todayDate;
     const log=state.dayLog&&state.dayLog[dateStr];
@@ -1345,8 +1348,8 @@ function buildCalendar(){
     }
 
     // Special markers
-    if(dateStr===new Date('2026-06-15').toDateString()) el.classList.add('start-day');
-    if(dateStr===new Date('2026-07-06').toDateString()) el.classList.add('end-day');
+    if(dateStr===new Date(2026,5,15).toDateString()) el.classList.add('start-day');
+    if(dateStr===new Date(2026,6,6).toDateString()) el.classList.add('end-day');
 
     const num=document.createElement('div');num.className='cal-num';num.textContent=d.getDate();el.appendChild(num);
 
@@ -1382,9 +1385,9 @@ function buildCalendar(){
   // Sprint progress
   const sprintDaysTotal=21;
   const now=new Date();now.setHours(0,0,0,0);
-  const elapsed=Math.max(0,Math.min(Math.floor((now-new Date('2026-06-15'))/86400000),sprintDaysTotal));
+  const elapsed=Math.max(0,Math.min(Math.floor((now-new Date(2026,5,15))/86400000),sprintDaysTotal));
   const completedDays=Object.keys(state.dayLog||{}).filter(k=>{
-    const d=new Date(k);return d>=new Date('2026-06-15')&&d<=new Date('2026-07-05')&&state.dayLog[k].blocks;
+    const d=new Date(k);return d>=new Date(2026,5,15)&&d<=new Date(2026,6,5)&&state.dayLog[k].blocks;
   }).length;
   document.getElementById('sprintDays').textContent=completedDays+' / '+sprintDaysTotal;
   const pct=Math.round(elapsed/sprintDaysTotal*100);
