@@ -343,7 +343,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 <div class="header">
   <div class="header-top">
     <div class="header-left">
-      <div class="eyebrow" id="eyebrow">Daily OS · Pre-launch</div>
+      <div class="eyebrow" id="eyebrow">Daily OS · Pre-launch · v0.5</div>
       <div class="player-name">Naveen</div>
       <div class="date-display" id="dateDisplay">—</div>
     </div>
@@ -609,6 +609,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
       <button class="debug-btn green" onclick="awardTestLoot()">💰 +$3 loot</button>
       <button class="debug-btn" onclick="initXpReset()">💀 Reset XP</button>
       <button class="debug-btn green" id="revertBtn" onclick="revertXp()">↩ Revert XP</button>
+      <button class="debug-btn" onclick="resetChests()">📦 Reset chests</button>
     </div>
     <div id="mathChallenge" style="display:none;margin-top:10px;background:var(--surface);border:1px solid var(--amber);border-radius:8px;padding:10px;">
       <div style="font-size:11px;color:var(--amber);margin-bottom:6px;" id="mathQuestion">—</div>
@@ -920,7 +921,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
   </div>
 
   <div class="chest-card chest-elliott" id="chest-elliott">
-    <div class="chest-header"><div class="chest-icon">🎮</div><div class="chest-info"><div class="chest-name">Elliott Chest</div><div class="chest-req">2 Perfect Stars · or 750 XP</div></div><div class="chest-status" id="status-elliott" style="color:var(--muted)">Locked</div></div>
+    <div class="chest-header"><div class="chest-icon">🎮</div><div class="chest-info"><div class="chest-name">Elliott Chest</div><div class="chest-req">2 Perfect Stars</div></div><div class="chest-status" id="status-elliott" style="color:var(--muted)">Locked</div></div>
     <div class="chest-track"><div class="chest-fill" id="fill-elliott" style="width:0%"></div></div>
     <button class="chest-btn" id="btn-elliott" onclick="openChest('elliott')">Open Chest</button>
   </div>
@@ -977,8 +978,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 
 <!-- ELLIOTT BANNER -->
 <div class="elliott-banner" id="elliottBanner">
-  <div class="elliott-banner-title">🎮 Adventures of Elliot: The Millennium Tales</div>
-  <div class="elliott-banner-sub">Unlocked, Naveen Pillai. Open the Nintendo eShop. You've earned it.</div>
+  <div class="elliott-banner-title">🎮 Big Game Reward</div>
+  <div class="elliott-banner-sub">Unlocked, Naveen Pillai. +$60 added to your gaming wallet.</div>
 </div>
 
 <!-- CHEST MODAL -->
@@ -1090,9 +1091,7 @@ const CHEST_REWARDS = {
     {r:'$15 Steam Credit', s:'Summer sale incoming. Bank it wisely.'},
     {r:'$13 Steam Credit', s:'Early reward. The wishlist approves.'},
   ]},
-  elliott:{ icon:'🎮', title:'Elliott Unlocked', rewards:[
-    {r:'Pre-order: Adventures of Elliot', s:'Open the Nintendo eShop. You have permission to pre-order. June 18 is coming.'}
-  ]},
+  elliott:{ icon:'🎮', title:'Big Game Reward', fixed:60, sub:'Two perfect stars, banked. Big game reward, unlocked.'},
   silver:{ icon:'🥈', title:'Silver Chest', rewards:[
     {r:'$22 Steam Credit', s:'NieR Replicant territory. You know what to do.'},
     {r:'$25 Steam Credit', s:'Trails Zero + Azure sorted. Or hold for Rebirth.'},
@@ -1508,6 +1507,12 @@ function openChest(id){
     modalState.options=pool.options;
     document.getElementById('modalSubtitle').textContent='Three rewards await. Reveal them one by one.';
     showPlatReveal(0);
+  } else if(pool.fixed){
+    document.getElementById('modalSubtitle').textContent='';
+    document.getElementById('revealArea').innerHTML=`<div class="modal-reward">$${pool.fixed} Gaming Credit</div><div class="modal-sub">${pool.sub}</div>`;
+    document.getElementById('modalBtn').textContent='Add to wallet';
+    document.getElementById('modalBtn').className='modal-btn gold';
+    document.getElementById('modalBtn').onclick=()=>{ addGamingDollars(pool.fixed); closeModal(); };
   } else if(pool.roll){
     // Roll the dollar amount now
     const amount = rollChestAmount(id);
@@ -1576,7 +1581,7 @@ function triggerElliottUnlock() {
   // Pulse the chest card
   const card = document.getElementById('chest-elliott');
   if(card){ card.classList.add('elliott-glow'); setTimeout(()=>card.classList.remove('elliott-glow'),1600); }
-  showLootToast('🎮 Adventures of Elliot: The Millennium Tales — unlocked!');
+  showLootToast('🎮 Big Game Reward — unlocked! +$60');
 }
 
 function updateChests(){
@@ -1914,6 +1919,12 @@ function hackXp(){
   state.xp=val;
   save();updateUI();updateDebug();
   showToast('XP set to '+val+' (old value saved for revert)');
+}
+
+function resetChests(){
+  state.openedChests = {};
+  save(); updateUI(); updateDebug();
+  showToast('All chests reset to unopened');
 }
 
 function awardTestLoot(){
