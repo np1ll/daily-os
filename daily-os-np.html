@@ -593,6 +593,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div class="debug-row"><span>Quest stars today</span><span class="debug-val" id="db-queststars">—</span></div>
     <div class="debug-row"><span>Banked stars</span><span class="debug-val" id="db-banked">—</span></div>
     <div class="debug-row"><span>Perfect history</span><span class="debug-val" id="db-history">—</span></div>
+    <div class="debug-row"><span>dayLog keys</span><span class="debug-val" id="db-daylog">—</span></div>
     <div class="debug-row"><span>Star count</span><span class="debug-val" id="db-stars">—</span></div>
     <div class="debug-row"><span>Loot total</span><span class="debug-val" id="db-loot">—</span></div>
     <div class="debug-row"><span>Pending loot</span><span class="debug-val" id="db-pending">—</span></div>
@@ -1633,7 +1634,7 @@ function useReroll(){
 function updateUI(){
   const weekend=isWeekend();
   document.getElementById('weekendBanner').classList.toggle('show',weekend);
-  document.getElementById('eyebrow').textContent=weekend?'Daily OS · Weekend 🌿':'Daily OS · Pre-launch';
+  document.getElementById('eyebrow').textContent=weekend?'Daily OS · Weekend 🌿 · v0.5':'Daily OS · Pre-launch · v0.5';
 
   // Date
   document.getElementById('dateDisplay').textContent=fmtDate(new Date());
@@ -1726,8 +1727,8 @@ function updateUI(){
   }
 
   updateChests();
-  buildCalendar();
   logDay();
+  buildCalendar();
   updateFolders();
   updateExBlock();
   renderPerfectPips();
@@ -1955,6 +1956,7 @@ function updateDebug(){
   document.getElementById('db-queststars').textContent=questStarsToday();
   document.getElementById('db-banked').textContent=getBankedStars();
   document.getElementById('db-history').textContent=JSON.stringify(state.perfectDaysHistory||[]);
+  document.getElementById('db-daylog').textContent=JSON.stringify(Object.keys(state.dayLog||{}));
   document.getElementById('db-stars').textContent=state.starCount||0;
   document.getElementById('db-loot').textContent='$'+(state.lootTotal||0);
   document.getElementById('db-pending').textContent='$'+(state.pendingLoot||0);
