@@ -256,6 +256,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 .cal-event-cal{font-size:10px;color:var(--muted);}
 .cal-allday-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3px 8px;margin-right:5px;margin-bottom:5px;font-size:11px;color:var(--muted);}
 .cal-allday-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+/* MINI ACCORDION (multi-step quests) */
+.mini-accordion{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;background:var(--surface2);}
+.mini-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;}
+.mini-title{font-size:12px;font-weight:700;color:var(--lightest);}
+.mini-right{display:flex;align-items:center;gap:8px;}
+.mini-progress{font-family:var(--fm);font-size:10px;color:var(--mid);background:rgba(92,164,144,.12);border-radius:5px;padding:2px 7px;}
+.mini-chevron{font-size:12px;color:var(--muted);transition:transform .2s;}
+.mini-accordion.open .mini-chevron{transform:rotate(90deg);}
+.mini-body{display:none;padding:0 8px 8px;}
+.mini-accordion.open .mini-body{display:block;}
 /* ICONS */
 .pip-star{display:inline-block;width:20px;height:20px;flex-shrink:0;}
 .pip-star.empty{opacity:0.18;}
@@ -343,7 +353,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 <div class="header">
   <div class="header-top">
     <div class="header-left">
-      <div class="eyebrow" id="eyebrow">Daily OS · Pre-launch · v0.5</div>
+      <div class="eyebrow" id="eyebrow">Daily OS · Pre-launch · v0.52</div>
       <div class="player-name">Naveen</div>
       <div class="date-display" id="dateDisplay">—</div>
     </div>
@@ -447,7 +457,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
       <div class="s-body"><div class="s-name">Wake + go outside</div><div class="s-sub" id="wake-sub">Tap to expand · partial XP</div></div>
       <div class="s-xp" id="wake-xp-total">+25</div>
     </div>
-    <div class="sub-block-list" id="wake-sublist" style="display:none;margin-top:8px;padding-left:30px;">
+    <div class="sub-block-list" id="wake-sublist" style="display:flex;flex-direction:column;margin-top:8px;padding-left:30px;">
       <div class="sub-item" onclick="toggleSubItem('wake_on_time')">
         <div class="sub-cb" id="subcb-wake_on_time">✓</div>
         <div class="sub-name">Wake on time</div>
@@ -468,7 +478,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
       <div class="s-body"><div class="s-name">Morning routine</div><div class="s-sub" id="morning-sub">Tap to expand · partial XP</div></div>
       <div class="s-xp" id="morning-xp-total">+15</div>
     </div>
-    <div class="sub-block-list" id="morning-sublist" style="display:none;margin-top:8px;padding-left:30px;">
+    <div class="sub-block-list" id="morning-sublist" style="display:flex;flex-direction:column;margin-top:8px;padding-left:30px;">
       <div class="sub-item" onclick="toggleSubItem('breakfast')">
         <div class="sub-cb" id="subcb-breakfast">✓</div>
         <div class="sub-name">Breakfast</div>
@@ -491,23 +501,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     </div>
     <div class="ex-day-toggle">
       <div class="ex-day-btn" id="tidy-btn-normal" onclick="selectTidyLevel('normal')">Normal · +10</div>
-      <div class="ex-day-btn" id="tidy-btn-messy" onclick="selectTidyLevel('messy')">Messy · +15</div>
-      <div class="ex-day-btn" id="tidy-btn-disaster" onclick="selectTidyLevel('disaster')">Disaster · +25</div>
+      <div class="ex-day-btn" id="tidy-btn-messy" onclick="selectTidyLevel('messy')">Messy · +20</div>
+      <div class="ex-day-btn" id="tidy-btn-disaster" onclick="selectTidyLevel('disaster')">Disaster · +40</div>
     </div>
   </div>
   <div class="s-row" id="sb-task" onclick="toggleBlock('task')">
     <div class="s-time" id="t-task">12:00</div><div class="s-dot" style="background:var(--mid-dark)"></div>
-    <div class="s-body"><div class="s-name">Main task</div><div class="s-sub">One quest item. Refund if done at any point today.</div></div>
+    <div class="s-body"><div class="s-name">Main task</div><div class="s-sub" id="task-sub">One quest item for the day.</div></div>
     <div class="s-xp">+40</div>
   </div>
-  <div class="s-row" id="sb-gaming" onclick="toggleBlock('gaming')">
+  <div class="s-row" id="sb-gaming" onclick="tapGaming()">
     <div class="s-time">—</div><div class="s-dot" style="background:var(--gold)"></div>
     <div class="s-body">
-      <div class="s-name">Morning gaming (XP loan)</div>
-      <div class="s-sub">Half XP now. Full refund + bonus if main task done today.</div>
-      <div class="s-badge badge-loan">⚠ loan · repaid when task done</div>
+      <div class="s-name">Gaming</div>
+      <div class="s-sub" id="gaming-sub">Tap when you start gaming. Quests before this get a 1.2× XP boost.</div>
+      <div class="s-badge badge-loan" id="gaming-badge" style="display:none;">multiplier window closed</div>
     </div>
-    <div class="s-xp">+10</div>
+    <div class="s-xp">marker</div>
   </div>
 
   <div class="sec-label">Afternoon</div>
@@ -664,7 +674,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div style="height:8px"></div>
     <div class="q-card" id="q-appbuild" onclick="toggleQuest('appbuild')"><div class="q-top"><div class="q-left"><div class="q-tag tag-meta">Meta · Boss</div><div class="q-name">Build the Daily OS app</div><div class="q-desc">Design, logic, chests, calendar, sleep shift, all quests — the whole thing. Tap when deployed.</div><div class="diff-row" id="dr-appbuild"></div></div><div class="q-right"><div class="q-xp">+100 XP</div><div class="q-cb" id="qcb-appbuild">✓</div></div></div></div>
     <div class="q-card" id="q-ghpages" onclick="toggleQuest('ghpages')"><div class="q-top"><div class="q-left"><div class="q-tag tag-meta">Meta</div><div class="q-name">Deploy to GitHub Pages</div><div class="q-desc">Repo created, Pages enabled, app live at a permanent URL, home screen shortcut on Android.</div><div class="diff-row" id="dr-ghpages"></div></div><div class="q-right"><div class="q-xp">+75 XP</div><div class="q-cb" id="qcb-ghpages">✓</div></div></div></div>
-    <div class="q-card locked" id="q-workout"><div class="q-top"><div class="q-left"><div class="q-tag tag-meta">Coming Soon</div><div class="q-name">Build workout routine</div><div class="q-desc">Push/pull split, leg raises, hip tendon rehab, OYO Nova integration. Pending routine design.</div></div><div class="q-right"><div class="q-xp">+??? XP</div><div class="q-cb">✓</div></div></div></div>
   </div>
 </div>
 
@@ -751,7 +760,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
   <div class="folder-progress"><div class="folder-progress-fill" id="fprog-boardgames" style="width:0%"></div></div>
   <div class="folder-body" id="fbody-boardgames">
     <div style="height:8px"></div>
-    <div class="q-group">Primal: The Awakening · organizer salvage · high dread acknowledged</div>
+    <div class="mini-accordion" id="mini-primal">
+      <div class="mini-header" onclick="toggleMiniAccordion('primal')">
+        <div class="mini-title">Primal: The Awakening · organizer salvage</div>
+        <div class="mini-right"><span class="mini-progress" id="mini-progress-primal">0/7</span><span class="mini-chevron">›</span></div>
+      </div>
+      <div class="mini-body" id="mini-body-primal">
     <div class="q-card" id="q-p1" onclick="toggleQuest('p1')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Primal · 1</div><div class="q-name">Get it off the shelf</div><div class="q-desc">Two minutes. Everything is blocked until this happens.</div><div class="q-note">The box being on the shelf is the real problem.</div><div class="diff-row" id="dr-p1"></div></div><div class="q-right"><div class="q-xp">+20 XP</div><div class="q-cb" id="qcb-p1">✓</div></div></div></div>
     <div class="q-card" id="q-p2" onclick="toggleQuest('p2')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Primal · 2</div><div class="q-name">Minis on the table</div><div class="q-desc">Everything out and laid flat. No sorting yet.</div><div class="diff-row" id="dr-p2"></div></div><div class="q-right"><div class="q-xp">+20 XP</div><div class="q-cb" id="qcb-p2">✓</div></div></div></div>
     <div class="q-card" id="q-p3" onclick="toggleQuest('p3')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Primal · 3</div><div class="q-name">Watch vid + make labels + attach</div><div class="q-desc">Setup video, pause and cross-reference, label as you go. Couch task with coffee.</div><div class="q-note">The car frustration is allowed to still be there. Just label what's in front of you.</div><div class="diff-row" id="dr-p3"></div></div><div class="q-right"><div class="q-xp">+80 XP</div><div class="q-cb" id="qcb-p3">✓</div></div></div></div>
@@ -759,6 +773,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div class="q-card" id="q-p5" onclick="toggleQuest('p5')"><div class="q-top"><div class="q-left"><div class="q-tag tag-warn">Primal · 5 ⚠</div><div class="q-name">Heat treatment on warped pieces</div><div class="q-desc">Warm water or hairdryer, reshape and hold. High stakes. Only attempt confirmed warped-but-intact pieces.</div><div class="q-note">It's okay to skip pieces you're not confident about.</div><div class="diff-row" id="dr-p5"></div></div><div class="q-right"><div class="q-xp">+100 XP</div><div class="q-cb" id="qcb-p5">✓</div></div></div></div>
     <div class="q-card" id="q-p6" onclick="toggleQuest('p6')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Primal · 6</div><div class="q-name">Identify minimum reprint list</div><div class="q-desc">Shortest possible list of what's truly irreplaceable.</div><div class="diff-row" id="dr-p6"></div></div><div class="q-right"><div class="q-xp">+80 XP</div><div class="q-cb" id="qcb-p6">✓</div></div></div></div>
     <div class="q-card" id="q-p7" onclick="toggleQuest('p7')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Primal · 7</div><div class="q-name">The ask</div><div class="q-desc">"Car thing was rough — only need X, Y, Z if you have a free print slot, no rush."</div><div class="diff-row" id="dr-p7"></div></div><div class="q-right"><div class="q-xp">+40 XP</div><div class="q-cb" id="qcb-p7">✓</div></div></div></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -781,12 +797,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div class="q-group">Hinge prep · before installation</div>
     <div class="q-card" id="q-hinge_box" onclick="toggleQuest('hinge_box')"><div class="q-top"><div class="q-left"><div class="q-tag tag-repair">Hinges · Prep</div><div class="q-name">Find box + remove old hinges from counter</div><div class="q-desc">Source a box for 26 old hinges (shoebox or slightly bigger). Clear old hardware off the counter — they're getting thrown away so no need to sort. Gets the workspace ready.</div><div class="diff-row" id="dr-hinge_box"></div></div><div class="q-right"><div class="q-xp">+20 XP</div><div class="q-cb" id="qcb-hinge_box">✓</div></div></div></div>
     <div class="q-card" id="q-hinge_sort" onclick="toggleQuest('hinge_sort')"><div class="q-top"><div class="q-left"><div class="q-tag tag-repair">Hinges · Prep</div><div class="q-name">Sort new hinge parts</div><div class="q-desc">More than 26 hinges in the batch — mixed together. Sort by type, count, group per cabinet session. ~30–45 min. Tedious but makes installation sessions much smoother.</div><div class="diff-row" id="dr-hinge_sort"></div></div><div class="q-right"><div class="q-xp">+50 XP</div><div class="q-cb" id="qcb-hinge_sort">✓</div></div></div></div>
-    <div class="q-group">Kitchen cabinet hinges · 5 sessions · hardware in hand</div>
+    <div class="mini-accordion" id="mini-hinges">
+      <div class="mini-header" onclick="toggleMiniAccordion('hinges')">
+        <div class="mini-title">Kitchen cabinet hinges · 5 sessions</div>
+        <div class="mini-right"><span class="mini-progress" id="mini-progress-hinges">0/5</span><span class="mini-chevron">›</span></div>
+      </div>
+      <div class="mini-body" id="mini-body-hinges">
     <div class="q-card" id="q-h1" onclick="toggleQuest('h1')"><div class="q-top"><div class="q-left"><div class="q-tag tag-repair">Repair · S1</div><div class="q-name">Upper left cabinets (6 hinges)</div><div class="q-desc">Best warm-up. Straightforward access.</div><div class="diff-row" id="dr-h1"></div></div><div class="q-right"><div class="q-xp">+60 XP</div><div class="q-cb" id="qcb-h1">✓</div></div></div></div>
     <div class="q-card" id="q-h2" onclick="toggleQuest('h2')"><div class="q-top"><div class="q-left"><div class="q-tag tag-repair">Repair · S2</div><div class="q-name">Single door (3 hinges)</div><div class="q-desc">Quick win — 20–30 min max.</div><div class="diff-row" id="dr-h2"></div></div><div class="q-right"><div class="q-xp">+40 XP</div><div class="q-cb" id="qcb-h2">✓</div></div></div></div>
     <div class="q-card" id="q-h3" onclick="toggleQuest('h3')"><div class="q-top"><div class="q-left"><div class="q-tag tag-repair">Repair · S3</div><div class="q-name">Above microwave (4 hinges)</div><div class="q-desc">Overhead work — take breaks, don't rush alignment.</div><div class="diff-row" id="dr-h3"></div></div><div class="q-right"><div class="q-xp">+80 XP</div><div class="q-cb" id="qcb-h3">✓</div></div></div></div>
     <div class="q-card" id="q-h4" onclick="toggleQuest('h4')"><div class="q-top"><div class="q-left"><div class="q-tag tag-repair">Repair · S4</div><div class="q-name">Corner unit — 3 doors (9 hinges)</div><div class="q-desc">Biggest batch. Multi-door alignment is fiddly. Do after S1–S3.</div><div class="diff-row" id="dr-h4"></div></div><div class="q-right"><div class="q-xp">+80 XP</div><div class="q-cb" id="qcb-h4">✓</div></div></div></div>
     <div class="q-card" id="q-h5" onclick="toggleQuest('h5')"><div class="q-top"><div class="q-left"><div class="q-tag tag-repair">Repair · S5</div><div class="q-name">Above fridge (4 hinges)</div><div class="q-desc">Hardest access. Do last when technique is sharpest.</div><div class="diff-row" id="dr-h5"></div></div><div class="q-right"><div class="q-xp">+80 XP</div><div class="q-cb" id="qcb-h5">✓</div></div></div></div>
+      </div>
+    </div>
     <div class="q-group">Other house tasks</div>
     <div class="q-card" id="q-lights" onclick="toggleQuest('lights')"><div class="q-top"><div class="q-left"><div class="q-tag tag-house">House</div><div class="q-name">Bathroom light strip</div><div class="q-desc">Measure first, clean surface before sticking, plan power routing. ~1 hr once parts in hand.</div><div class="diff-row" id="dr-lights"></div></div><div class="q-right"><div class="q-xp">+40 XP</div><div class="q-cb" id="qcb-lights">✓</div></div></div></div>
     <div class="q-card" id="q-wires" onclick="toggleQuest('wires')"><div class="q-top"><div class="q-left"><div class="q-tag tag-house">House</div><div class="q-name">Wire covers on upstairs walls</div><div class="q-desc">Do the worst corner first. Spiritually a 4. Physically fine.</div><div class="diff-row" id="dr-wires"></div></div><div class="q-right"><div class="q-xp">+80 XP</div><div class="q-cb" id="qcb-wires">✓</div></div></div></div>
@@ -883,6 +906,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
       </div><div class="q-right"><div class="q-xp">+30 XP</div><div class="q-cb" id="qcb-football">✓</div></div></div>
     </div>
 
+    <!-- SHIP BOARD GAME ORDER — multi-step recurring quest -->
+    <div class="mini-accordion" id="mini-shiporder">
+      <div class="mini-header" onclick="toggleMiniAccordion('shiporder')">
+        <div class="mini-title">Ship board game order</div>
+        <div class="mini-right"><span class="mini-progress" id="mini-progress-shiporder">0/4</span><span class="mini-chevron">›</span></div>
+      </div>
+      <div class="mini-body" id="mini-body-shiporder">
+        <div style="font-size:11px;color:var(--muted);padding:6px 4px 10px;line-height:1.6;">Complete all 4 steps to ship an order. Resets automatically once done — ready for the next one.</div>
+        <div class="q-card" id="q-ship1" onclick="toggleShipStep('ship1')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Ship · 1</div><div class="q-name">Locate + find box + check economical</div><div class="q-desc">Find the game, source a box that fits, run the shipping estimate.</div><div class="diff-row" id="dr-ship1"></div></div><div class="q-right"><div class="q-xp">+10 XP</div><div class="q-cb" id="qcb-ship1">✓</div></div></div></div>
+        <div class="q-card" id="q-ship2" onclick="toggleShipStep('ship2')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Ship · 2</div><div class="q-name">Optimise for economical box</div><div class="q-desc">The hard part. Multiple trips, repack, re-estimate until it works.</div><div class="q-note">Put on a podcast.</div><div class="diff-row" id="dr-ship2"></div></div><div class="q-right"><div class="q-xp">+40 XP</div><div class="q-cb" id="qcb-ship2">✓</div></div></div></div>
+        <div class="q-card" id="q-ship3" onclick="toggleShipStep('ship3')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Ship · 3</div><div class="q-name">Print label + pack</div><div class="q-desc">Print shipping label, pack carefully, seal.</div><div class="diff-row" id="dr-ship3"></div></div><div class="q-right"><div class="q-xp">+10 XP</div><div class="q-cb" id="qcb-ship3">✓</div></div></div></div>
+        <div class="q-card" id="q-ship4" onclick="toggleShipStep('ship4')"><div class="q-top"><div class="q-left"><div class="q-tag tag-board">Ship · 4</div><div class="q-name">Drop off</div><div class="q-desc">Out the door. Done.</div><div class="diff-row" id="dr-ship4"></div></div><div class="q-right"><div class="q-xp">+20 XP</div><div class="q-cb" id="qcb-ship4">✓</div></div></div></div>
+      </div>
+    </div>
+
     <div class="q-card" id="q-app_update_simple" onclick="toggleRecurring('app_update_simple')">
       <div class="q-top"><div class="q-left">
         <div class="q-tag tag-meta">Recurring · Dev</div>
@@ -913,7 +951,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 </div>
 
 <div class="panel" id="panel-chests">
-  <div class="sec-label">Reward Chests</div>
+
+  <div class="sec-label">Daily Chests</div>
+  <div id="dailyChestList"></div>
+  <div id="noDailyChests" style="font-size:12px;color:var(--muted);text-align:center;padding:16px;background:var(--surface);border-radius:10px;margin-bottom:10px;">No daily chests yet — earn one on your next perfect day 🌿</div>
+
+  <div class="sec-label">Milestone Chests</div>
 
   <div class="chest-card chest-bronze" id="chest-bronze">
     <div class="chest-header"><div class="chest-icon">🥉</div><div class="chest-info"><div class="chest-name">Bronze Chest</div><div class="chest-req">400 XP</div></div><div class="chest-status" id="status-bronze" style="color:var(--muted)">Locked</div></div>
@@ -1023,7 +1066,7 @@ const XP_PER_LEVEL = 300;
 const KEY = 'np_os_v1';
 const BASE_TIMES = { wake:12*60, morning:12*60+15, tidy:12*60+45, task:13*60, exercise:15*60, free:15*60+30, wind:22*60 };
 
-const BLOCK_XP = { wake:15,morning:15,tidy:15,task:40,gaming:10,lunch:5,exercise:50,free:5,dinner:15,wind:15,gamestop:20,sleep:20 };
+const BLOCK_XP = { wake:15,morning:15,tidy:15,task:40,lunch:5,exercise:50,free:5,dinner:15,wind:15,gamestop:20,sleep:20 };
 const QUEST_XP = {
   appbuild:100, ghpages:75,
   h1:60,h2:40,h3:80,h4:80,h5:80,
@@ -1041,6 +1084,7 @@ const QUEST_XP = {
   // Recurring
   prep_cream_cheese:70, prep_choco_hazel:70,
   pills_morning:15, pills_evening:5,
+  ship1:10, ship2:40, ship3:10, ship4:20,
   football:30,
   app_update_simple:5, app_update_bugfix:15,
   // Hinge box
@@ -1064,6 +1108,7 @@ const QUEST_DIFF = {
   earphones:0,
   prep_cream_cheese:3.5, prep_choco_hazel:3.5,
   pills_morning:1.5, pills_evening:0.5,
+  ship1:0.5, ship2:2, ship3:0.5, ship4:1,
   football:2,
   app_update_simple:0.5, app_update_bugfix:1,
   hinge_box:1, hinge_sort:2,
@@ -1087,22 +1132,19 @@ function rollChestAmount(id) {
 }
 
 const CHEST_REWARDS = {
-  bronze:{ icon:'🥉', title:'Bronze Chest', rewards:[
-    {r:'$12 Steam Credit', s:'Pick anything under $12 from the wishlist. Wargroove, Into the Breach — all fair game.'},
-    {r:'$15 Steam Credit', s:'Summer sale incoming. Bank it wisely.'},
-    {r:'$13 Steam Credit', s:'Early reward. The wishlist approves.'},
-  ]},
+  bronze:{ icon:'🥉', title:'Bronze Chest', roll:true,
+    subs:['Pick anything under the cap from the wishlist. Wargroove, Into the Breach — all fair game.',
+          'Summer sale incoming. Bank it wisely.',
+          'Early reward. The wishlist approves.'] },
   elliott:{ icon:'🎮', title:'Big Game Reward', fixed:60, sub:'Two perfect stars, banked. Big game reward, unlocked.'},
-  silver:{ icon:'🥈', title:'Silver Chest', rewards:[
-    {r:'$22 Steam Credit', s:'NieR Replicant territory. You know what to do.'},
-    {r:'$25 Steam Credit', s:'Trails Zero + Azure sorted. Or hold for Rebirth.'},
-    {r:'$20 Steam Credit', s:'Mid-run reward. The wishlist is grateful.'},
-  ]},
-  gold:{ icon:'🥇', title:'Gold Chest', rewards:[
-    {r:'$35 Steam Credit', s:'FF7 Rebirth fund is real. Keep going.'},
-    {r:'$40 Steam Credit', s:'Nearly enough for Rebirth solo. The finish line is close.'},
-    {r:'$32 Steam Credit', s:'Late-run reward. Almost there.'},
-  ]},
+  silver:{ icon:'🥈', title:'Silver Chest', roll:true,
+    subs:['NieR Replicant territory. You know what to do.',
+          'Trails Zero + Azure sorted. Or hold for Rebirth.',
+          'Mid-run reward. The wishlist is grateful.'] },
+  gold:{ icon:'🥇', title:'Gold Chest', roll:true,
+    subs:['FF7 Rebirth fund is real now. Keep going.',
+          'Nearly enough for Rebirth solo. The finish line is close.',
+          'Late-run reward. Almost there.'] },
   platinum:{ icon:'💎', title:'Platinum — New Chapter', options:[
     {t:'Official Liverpool Kit', s:'Current season. The real thing. You made it through the pre-launch arc.'},
     {t:'Liverpool framed print or signed item', s:'Something for the wall. A permanent reminder of this run.'},
@@ -1134,7 +1176,10 @@ const defState = {
   lastExDay:null, lastExType:null, weekSkips:0, lastSkipWeek:-1,
   recurringCounts:{}, recurringDayCounts:{},
   questCompletionDates:{},
-  subItems:{}, tidyLevel:null // date -> {blocks:bool, perfect:bool, xp:num, questStars:num, weekendQuests:num}
+  subItems:{}, tidyLevel:null, // date -> {blocks:bool, perfect:bool, xp:num, questStars:num, weekendQuests:num}
+  dailyChests:[], lastOpenedDailyChestIdx:undefined,
+  tidyWasBeforeGaming:false,
+  gamingTapped:false, gamingTappedDate:null
 };
 
 let state = load()||{...defState};
@@ -1362,18 +1407,6 @@ function buildCalendar(){
       const sstar=document.createElement('div');sstar.className='cal-star-silver';sstar.textContent='✦';el.appendChild(sstar);
     }
 
-    // Dots for quest stars
-    if(log&&log.questStars>0&&!isFuture){
-      const dots=document.createElement('div');dots.className='cal-dots';
-      const count=Math.min(log.questStars,5);
-      for(let j=0;j<count;j++){
-        const dot=document.createElement('div');
-        dot.className='cal-dot';
-        dot.style.background=log.perfect?'var(--gold)':log.questStars>=3?'var(--mid)':'var(--muted)';
-        dots.appendChild(dot);
-      }
-      el.appendChild(dots);
-    }
 
     if(inSprint&&!isFuture){
       el.style.cursor='pointer';
@@ -1439,11 +1472,11 @@ function checkPerfectDay(){
   if(state.starCount >= 2 && !(state.openedChests&&state.openedChests['elliott'])) {
     setTimeout(() => triggerElliottUnlock(), 800);
   }
-  const loot=DAILY_LOOT[Math.floor(Math.random()*DAILY_LOOT.length)];
-  state.pendingLoot=(state.pendingLoot||0)+loot;
-  state.lootTotal=(state.lootTotal||0)+loot;
+  // Add a stacking perfect-day chest instead of instant loot
+  if(!state.dailyChests) state.dailyChests = [];
+  state.dailyChests.push({ id: 'daily_'+Date.now(), opened: false, amount: null });
   logDay();save();updateUI();
-  showLootToast('Perfect Day! 🌟 +$'+loot+' gaming dollars — reroll available', true);
+  showLootToast('Perfect Day! 🌟 A new chest is waiting in Chests', false);
 }
 
 function checkWeekendStars(){
@@ -1588,6 +1621,51 @@ function triggerElliottUnlock() {
   showLootToast('🎮 Big Game Reward — unlocked! +$60');
 }
 
+function renderDailyChests(){
+  const list = document.getElementById('dailyChestList');
+  const empty = document.getElementById('noDailyChests');
+  if(!list) return;
+  const chests = state.dailyChests || [];
+
+  if(chests.length === 0){
+    list.innerHTML = '';
+    if(empty) empty.style.display = 'block';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+
+  let html = '';
+  chests.forEach((c, idx) => {
+    if(c.opened){
+      html += `<div class="chest-card opened" style="opacity:.55;">
+        <div class="chest-header"><div class="chest-icon">🌿</div><div class="chest-info"><div class="chest-name">Perfect Day Chest</div><div class="chest-req">Opened — $${c.amount}</div></div><div class="chest-status" style="color:var(--muted)">✓</div></div>
+      </div>`;
+    } else {
+      html += `<div class="chest-card unlocked" id="dailychest-${idx}">
+        <div class="chest-header"><div class="chest-icon">🌿</div><div class="chest-info"><div class="chest-name">Perfect Day Chest</div><div class="chest-req">Ready to open</div></div><div class="chest-status" style="color:var(--mid)">Unlocked!</div></div>
+        <button class="chest-btn show" onclick="openDailyChest(${idx})">Open Chest</button>
+      </div>`;
+    }
+  });
+  list.innerHTML = html;
+}
+
+function openDailyChest(idx){
+  if(!state.dailyChests || !state.dailyChests[idx]) return;
+  const chest = state.dailyChests[idx];
+  if(chest.opened) return;
+
+  const amount = DAILY_LOOT[Math.floor(Math.random()*DAILY_LOOT.length)];
+  chest.opened = true;
+  chest.amount = amount;
+  state.pendingLoot = amount; // most recently opened becomes the active reroll target
+  state.lootTotal = (state.lootTotal||0) + amount;
+  state.lastOpenedDailyChestIdx = idx;
+
+  save(); updateUI();
+  showLootToast('🌿 +$'+amount+' gaming dollars — reroll available', true);
+}
+
 function updateChests(){
   const xp=state.xp,stars=state.starCount||0;
   [
@@ -1613,6 +1691,7 @@ function updateChests(){
     if(btn)btn.classList.toggle('show',unlocked&&!opened);
     if(card){card.classList.toggle('unlocked',unlocked&&!opened);card.classList.toggle('opened',!!opened);}
   });
+  renderDailyChests();
 }
 
 // ── REROLL ──
@@ -1629,6 +1708,10 @@ function useReroll(){
   const diff=loot-current;
   state.lootTotal=Math.max(0,(state.lootTotal||0)+diff);
   state.pendingLoot=loot;
+  // Sync the rerolled amount back into the daily chest record, if applicable
+  if(state.lastOpenedDailyChestIdx !== undefined && state.dailyChests && state.dailyChests[state.lastOpenedDailyChestIdx]){
+    state.dailyChests[state.lastOpenedDailyChestIdx].amount = loot;
+  }
   save();updateUI();
   showLootToast('Rerolled! +$'+loot+' 🎲'+(higher.length===0?' (already at max)':''));
 }
@@ -1637,7 +1720,18 @@ function useReroll(){
 function updateUI(){
   const weekend=isWeekend();
   document.getElementById('weekendBanner').classList.toggle('show',weekend);
-  document.getElementById('eyebrow').textContent=weekend?'Daily OS · Weekend 🌿 · v0.5':'Daily OS · Pre-launch · v0.5';
+  document.getElementById('eyebrow').textContent=weekend?'Daily OS · Weekend 🌿 · v0.52':'Daily OS · Pre-launch · v0.52';
+
+  // Sync gaming badge state on load
+  const gamingBadge = document.getElementById('gaming-badge');
+  const gamingSub = document.getElementById('gaming-sub');
+  if(gamingBadge && gamingSub){
+    const active = isGamingActiveToday();
+    gamingBadge.style.display = active ? 'none' : 'inline-block';
+    gamingSub.textContent = active
+      ? 'Tap when you start gaming. Quests before this get a 1.2× XP boost.'
+      : 'Multiplier window closed for today.';
+  }
 
   // Date
   document.getElementById('dateDisplay').textContent=fmtDate(new Date());
@@ -1734,11 +1828,15 @@ function updateUI(){
   buildCalendar();
   updateFolders();
   updateExBlock();
+  reorderAfternoonBlocks();
   renderPerfectPips();
   renderQuestPips();
   restoreSubItemStates();
   updateTidyDisplay();
   updateAllRecurringBadges();
+  updateMiniAccordions();
+  sinkCompletedQuests();
+  sinkCompletedFolders();
   if(document.getElementById("debugPanel")?.style.display!=="none") updateDebug();
 }
 
@@ -1773,19 +1871,62 @@ function showLootToast(msg, withAnimation){
   }
 }
 
+function toggleShipStep(id){
+  const card = document.getElementById('q-'+id);
+  if(!card) return;
+  const xp = QUEST_XP[id]||0;
+
+  if(state.quests[id]){
+    delete state.quests[id];
+    state.xp = Math.max(0, state.xp - xp);
+    showToast('↩ Step unmarked');
+  } else {
+    state.quests[id] = true;
+    state.xp += xp;
+    showToast('+'+xp+' XP ⚡');
+
+    // Check if all 4 ship steps are now done
+    const allDone = SHIP_STEP_IDS.every(sid=>state.quests[sid]);
+    if(allDone){
+      setTimeout(()=>{
+        SHIP_STEP_IDS.forEach(sid=>delete state.quests[sid]);
+        save(); updateUI();
+        showLootToast('📦 Order shipped! Ready for the next one.');
+      }, 600);
+    }
+  }
+  save(); updateUI();
+}
+
 function toggleBlock(id){
   const xp=BLOCK_XP[id];
-  if(state.blocks[id]){delete state.blocks[id];state.xp=Math.max(0,state.xp-xp);showToast('↩ Unmarked');}
-  else{state.blocks[id]=true;state.xp+=xp;showToast('+'+xp+' XP ⚡');checkPerfectDay();}
+  if(state.blocks[id]){
+    delete state.blocks[id];state.xp=Math.max(0,state.xp-xp);showToast('↩ Unmarked');
+  } else {
+    state.blocks[id]=true;state.xp+=xp;showToast('+'+xp+' XP ⚡');checkPerfectDay();
+    // No-procrastination tracking: main task done before gaming tapped today
+    if(id==='task' && isGamingActiveToday()){
+      state.noProcrastCount=(state.noProcrastCount||0)+1;
+      if(state.noProcrastCount%3===0){state.rerolls=(state.rerolls||0)+1;showLootToast('Bonus reroll! 🎲 3 task-before-gaming days');}
+    }
+  }
   save();updateUI();
+}
+
+function isGamingActiveToday(){
+  // Multiplier window is open if gaming hasn't been tapped today
+  return !(state.gamingTapped && state.gamingTappedDate === getGameDay());
 }
 
 function toggleQuest(id){
   const card=document.getElementById('q-'+id);
   if(!id||card?.classList.contains('locked'))return;
-  const xp=QUEST_XP[id];
+  const baseXp=QUEST_XP[id];
   const weekend=isWeekend();
   const bonus=weekend?WEEKEND_BONUS:0;
+  const multiplierActive = isGamingActiveToday();
+  const xp = multiplierActive ? Math.round(baseXp*1.2) : baseXp;
+
   if(state.quests[id]){
     delete state.quests[id];
     state.xp=Math.max(0,state.xp-xp-(weekend?bonus:0));
@@ -1796,16 +1937,26 @@ function toggleQuest(id){
     if(!state.questCompletionDates) state.questCompletionDates={};
     state.questCompletionDates[id]=getGameDay();
     if(id==='earphones') showLootToast('🎧 FOUND THEM! +50 XP');
+    else if(multiplierActive) showToast('+'+xp+' XP (1.2× before gaming) ⚡'+(bonus>0?' + '+bonus+' weekend':''));
     else if(bonus>0) showToast('+'+xp+' XP + '+bonus+' weekend bonus 🌿');
     else showToast('Quest done! +'+xp+' XP 🌿');
     if(weekend) checkWeekendStars();
     checkPerfectDay();
-    if(state.blocks['task']&&!state.blocks['gaming']){
-      state.noProcrastCount=(state.noProcrastCount||0)+1;
-      if(state.noProcrastCount%3===0){state.rerolls=(state.rerolls||0)+1;showLootToast('Bonus reroll! 🎲 3 no-loan days');}
-    }
   }
   save();updateUI();
+}
+
+function tapGaming(){
+  if(state.gamingTapped && state.gamingTappedDate === getGameDay()){
+    showToast('Multiplier window already closed today');
+    return;
+  }
+  state.gamingTapped = true;
+  state.gamingTappedDate = getGameDay();
+  showToast('🎮 Gaming tapped — 1.2× quest window closed for today');
+  const badge = document.getElementById('gaming-badge');
+  if(badge) badge.style.display = 'inline-block';
+  save(); updateUI();
 }
 
 function resetDay(){
@@ -1823,9 +1974,10 @@ function resetDay(){
   state.subItems={};
   // Reverse tidy XP
   if(state.tidyLevel && state.blocks['tidy']){
-    state.xp=Math.max(0,state.xp-(TIDY_XP[state.tidyLevel]||0));
+    state.xp=Math.max(0,state.xp-getTidyXp(state.tidyLevel, state.tidyWasBeforeGaming));
   }
   state.tidyLevel=null;
+  state.tidyWasBeforeGaming=false;
   state.blocks={};save();updateUI();showToast('Day reset');
 }
 
@@ -1890,6 +2042,10 @@ function confirmXpReset(){
   state.recurringTicked = {};
   state.subItems = {};
   state.tidyLevel = null;
+  state.dailyChests = [];
+  state.lastOpenedDailyChestIdx = undefined;
+  state.gamingTapped = false;
+  state.gamingTappedDate = null;
   document.getElementById('mathChallenge').style.display='none';
   save(); updateUI(); updateDebug();
   showToast('Full reset done — tap Revert to undo');
@@ -2235,15 +2391,24 @@ function restoreSubItemStates(){
   Object.keys(SUB_GROUPS).forEach(group=>{
     const ids = SUB_GROUPS[group];
     const anyDone = ids.some(id=>state.subItems && state.subItems[id]);
+    const allDone = ids.every(id=>state.subItems && state.subItems[id]);
     const earnedXp = ids.reduce((s,id)=> s + (state.subItems&&state.subItems[id] ? SUB_ITEMS[id].xp : 0), 0);
     const totalXp = ids.reduce((s,id)=> s + SUB_ITEMS[id].xp, 0);
     const subEl = document.getElementById(group+'-sub');
     if(subEl) subEl.textContent = anyDone ? `${earnedXp} / ${totalXp} XP earned` : 'Tap to expand · partial XP';
+    // Parent row greys out once all sub-items are done — was missing here
+    const row = document.getElementById('sb-'+group);
+    if(row) row.classList.toggle('done', allDone);
   });
 }
 
 // ── DOWNSTAIRS TIDY (3-button) ──
-const TIDY_XP = {normal:10, messy:15, disaster:25};
+const TIDY_XP = {normal:10, messy:20, disaster:40};
+
+function getTidyXp(level, beforeGaming){
+  const base = TIDY_XP[level]||0;
+  return beforeGaming ? Math.round(base*1.5) : base;
+}
 
 function selectTidyLevel(level){
   const wasSelected = state.tidyLevel === level;
@@ -2253,19 +2418,23 @@ function selectTidyLevel(level){
   });
 
   if(wasSelected){
-    // Deselect — undo XP
-    state.xp = Math.max(0, state.xp - (TIDY_XP[state.tidyLevel]||0));
+    // Deselect — undo XP using the multiplier state that was locked in at selection time
+    state.xp = Math.max(0, state.xp - getTidyXp(state.tidyLevel, state.tidyWasBeforeGaming));
     state.tidyLevel = null;
+    state.tidyWasBeforeGaming = false;
     state.blocks['tidy'] = false;
   } else {
     // Remove old XP if switching levels same day
     if(state.tidyLevel && state.blocks['tidy']){
-      state.xp = Math.max(0, state.xp - (TIDY_XP[state.tidyLevel]||0));
+      state.xp = Math.max(0, state.xp - getTidyXp(state.tidyLevel, state.tidyWasBeforeGaming));
     }
+    const beforeGaming = isGamingActiveToday();
     state.tidyLevel = level;
-    state.xp += TIDY_XP[level];
+    state.tidyWasBeforeGaming = beforeGaming;
+    const xp = getTidyXp(level, beforeGaming);
+    state.xp += xp;
     state.blocks['tidy'] = true;
-    showToast('+'+TIDY_XP[level]+' XP ⚡');
+    showToast(beforeGaming ? '+'+xp+' XP (1.5× before gaming) ⚡' : '+'+xp+' XP ⚡');
     const btn = document.getElementById('tidy-btn-'+level);
     if(btn) btn.classList.add('selected');
   }
@@ -2327,6 +2496,26 @@ function selectExDay(day) {
   state.lastExType = day;
   state.lastExDay = new Date().toDateString();
   save(); updateUI();
+}
+
+function reorderAfternoonBlocks(){
+  const s = getDaySchedule();
+  const lunchEl = document.getElementById('sb-lunch');
+  const exEl = document.getElementById('sb-exercise');
+  if(!lunchEl || !exEl) return;
+  const parent = lunchEl.parentNode;
+  if(!parent) return;
+
+  // If exercise should come before lunch chronologically, move it before
+  if(s.exercise < s.lunch){
+    if(lunchEl.previousElementSibling !== exEl){
+      parent.insertBefore(exEl, lunchEl);
+    }
+  } else {
+    if(exEl.previousElementSibling !== lunchEl){
+      parent.insertBefore(lunchEl, exEl);
+    }
+  }
 }
 
 function updateExBlock() {
@@ -2412,6 +2601,38 @@ function renderQuestPips() {
   el.innerHTML = h;
 }
 
+// ── MINI ACCORDIONS (multi-step quests) ──
+const MINI_ACCORDIONS = {
+  primal: ['p1','p2','p3','p4','p5','p6','p7'],
+  hinges: ['h1','h2','h3','h4','h5'],
+  shiporder: ['ship1','ship2','ship3','ship4']
+};
+const SHIP_STEP_IDS = ['ship1','ship2','ship3','ship4'];
+
+function toggleMiniAccordion(id){
+  const el = document.getElementById('mini-'+id);
+  if(!el) return;
+  el.classList.toggle('open');
+  if(!state.miniAccordionState) state.miniAccordionState = {};
+  state.miniAccordionState[id] = el.classList.contains('open');
+  save();
+}
+
+function updateMiniAccordions(){
+  Object.keys(MINI_ACCORDIONS).forEach(id=>{
+    const quests = MINI_ACCORDIONS[id];
+    const done = quests.filter(qid=>state.quests[qid]).length;
+    const total = quests.length;
+    const progEl = document.getElementById('mini-progress-'+id);
+    if(progEl) progEl.textContent = done+'/'+total;
+    // Restore open/closed state
+    const el = document.getElementById('mini-'+id);
+    if(el && state.miniAccordionState && state.miniAccordionState[id] !== undefined){
+      el.classList.toggle('open', state.miniAccordionState[id]);
+    }
+  });
+}
+
 // ── FOLDERS ──
 const FOLDER_QUESTS = {
   health: ['pullupbar','pf','workout'],
@@ -2440,6 +2661,62 @@ function restoreFolderStates() {
     if(!el) return;
     if(state.folderState[id]) el.classList.add('open');
     else el.classList.remove('open');
+  });
+}
+
+function sinkCompletedFolders(){
+  const panel = document.getElementById('panel-quests');
+  if(!panel) return;
+
+  const folders = Array.from(panel.children).filter(el=>el.classList.contains('folder'));
+  if(folders.length === 0) return;
+
+  const active = [];
+  const done = [];
+
+  folders.forEach(folder=>{
+    const fid = folder.id.replace('folder-','');
+    const quests = FOLDER_QUESTS[fid] || [];
+    const isRecurringFolder = fid === 'recurring';
+    if(isRecurringFolder){
+      active.push(folder); // recurring folder never "completes"
+      return;
+    }
+    const validQuests = quests.filter(id=>QUEST_XP[id]);
+    const allDone = validQuests.length > 0 && validQuests.every(id=>state.quests[id]);
+    (allDone ? done : active).push(folder);
+  });
+
+  // Re-append: active folders first (original order), then fully-done folders
+  active.forEach(f=>panel.appendChild(f));
+  done.forEach(f=>panel.appendChild(f));
+
+  // Reset button must always stay last
+  const resetBtn = panel.querySelector('.reset-btn');
+  if(resetBtn) panel.appendChild(resetBtn);
+}
+
+function sinkCompletedQuests(){
+  // Within each folder body, move completed quest cards (not inside mini-accordions) to the bottom
+  Object.keys(FOLDER_QUESTS).forEach(fid=>{
+    const body = document.getElementById('fbody-'+fid);
+    if(!body) return;
+    // Only target direct-child q-cards, not ones nested inside mini-accordion bodies
+    const cards = Array.from(body.children).filter(el=>el.classList.contains('q-card'));
+    if(cards.length === 0) return;
+
+    const incomplete = [];
+    const complete = [];
+    cards.forEach(card=>{
+      const id = card.id.replace('q-','');
+      const isRecurring = RECURRING_IDS.includes(id);
+      const isDone = isRecurring ? false : !!state.quests[id]; // recurring never "sinks", they're always active
+      (isDone ? complete : incomplete).push(card);
+    });
+
+    // Re-append: incomplete first (in original relative order), then complete
+    incomplete.forEach(card=>body.appendChild(card));
+    complete.forEach(card=>body.appendChild(card));
   });
 }
 

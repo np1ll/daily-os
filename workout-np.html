@@ -45,6 +45,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 
 .ex-warning{background:rgba(217,95,95,.08);border:1px solid rgba(217,95,95,.2);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--red);line-height:1.5;}
 .ex-tip{background:rgba(92,164,144,.08);border:1px solid rgba(92,164,144,.2);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--light-mid);line-height:1.5;}
+.ex-diagram{background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;}
+.ex-diagram svg{width:100%;max-width:200px;height:auto;}
+.spot-marker{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;}
+.spot-figure{width:56px;height:68px;flex-shrink:0;}
+.spot-label{font-size:12px;color:var(--light-mid);line-height:1.55;}
+.spot-label strong{color:var(--lightest);display:block;font-size:13px;margin-bottom:2px;}
+.progress-note{font-size:11px;color:var(--muted);text-align:center;margin:6px 0 16px;font-family:var(--fm);}
+.progress-note .arrow{color:var(--mid);margin:0 6px;}
+.ex-card.safest{border-left:3px solid var(--mid);}
+.ex-card.hardest{border-left:3px solid var(--amber);}
+.ex-stage{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:6px;}
 
 .sec-label{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin:20px 0 10px;}
 .sec-label:first-child{margin-top:0;}
@@ -79,8 +90,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('daya',this)">Day A — Push</button>
-  <button class="tab" onclick="switchTab('dayb',this)">Day B — Pull</button>
+  <button class="tab active" onclick="switchTab('daya',this)">Day A</button>
+  <button class="tab" onclick="switchTab('dayb',this)">Day B</button>
+  <button class="tab" onclick="switchTab('hipflexor',this)">Hip Flexor</button>
   <button class="tab" onclick="switchTab('notes',this)">Notes</button>
 </div>
 
@@ -172,11 +184,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
       <div class="ex-info">
         <div class="ex-name">Single-Leg Romanian Deadlift</div>
         <div class="ex-sets">3 sets · 8 reps each leg · bodyweight · very slow</div>
-        <div class="ex-cue">Stand on one leg, slight bend in the standing knee. Hinge at the hip — let your torso come forward and the free leg extend behind you as a counterbalance. Go until you feel a stretch in the hamstring of the standing leg, then drive through the hip to return upright. Keep your back flat throughout — no rounding. Go slow: 3 seconds down, 1 second hold, 2 seconds up. This is your hip tendon rehab exercise — the hip on the standing leg is doing the work.</div>
+        <div class="ex-cue">Stand on one leg, slight bend in the standing knee. Hinge at the hip — let your torso come forward and the free leg extend behind you as a counterbalance. Go until you feel a stretch in the hamstring of the standing leg, then drive through the hip to return upright. Keep your back flat throughout — no rounding. Go slow: 3 seconds down, 1 second hold, 2 seconds up. Good general posterior-chain/stability work — pairs well with the front-of-hip work in the Hip Flexor tab.</div>
       </div>
       <div class="ex-tag tag-rehab">Rehab</div>
     </div>
-    <div class="ex-warning">⚠ Right hip — this is the target side. If you feel sharp pain (not muscle burn) stop immediately. Mild discomfort/tension in the hip tendon area is normal and expected. Start with bodyweight only, no added load.</div>
+    <div class="ex-warning">⚠ Right hip — general stability work for this side. If you feel sharp pain (not muscle burn) stop immediately. For the specific tendon rehab (front hip crease), see the Hip Flexor tab.</div>
   </div>
 
   <div class="ex-card">
@@ -190,6 +202,131 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
       <div class="ex-tag tag-core">Core</div>
     </div>
     <div class="ex-tip">Dead bug looks deceptively easy. The core engagement needed to keep your lower back flat is the entire point — you'll feel it by rep 6.</div>
+  </div>
+</div>
+
+<!-- ══ HIP FLEXOR ══ -->
+<div class="panel" id="panel-hipflexor">
+  <div class="sec-label">Iliopsoas / Hip Flexor · ~10 min</div>
+
+  <div class="spot-marker">
+    <svg class="spot-figure" viewBox="0 0 64 78" fill="none">
+      <ellipse cx="32" cy="10" rx="9" ry="9" fill="#3E887B" opacity="0.4"/>
+      <path d="M20 22 Q32 18 44 22 L46 40 Q44 55 38 64 L34 76 L30 76 L28 60 Q20 55 18 40 Z" fill="#172219" stroke="#1f3327" stroke-width="1.5"/>
+      <circle cx="27" cy="38" r="7" fill="#d4943a" opacity="0.85"/>
+      <circle cx="27" cy="38" r="3" fill="#d4943a"/>
+    </svg>
+    <div class="spot-label">
+      <strong>The spot</strong>
+      Hip crease, front-middle — where the iliopsoas tendon inserts. Same area aggravated by sprints and hard kicks.
+    </div>
+  </div>
+
+  <div class="progress-note">Isometric <span class="arrow">→</span> Concentric <span class="arrow">→</span> Stretch</div>
+
+  <div class="ex-card safest">
+    <div class="ex-card-header">
+      <div class="ex-num">01</div>
+      <div class="ex-info">
+        <div class="ex-stage">Stage 1 · Start here</div>
+        <div class="ex-name">Isometric hip flexion hold</div>
+      </div>
+    </div>
+    <div class="ex-diagram">
+      <svg viewBox="0 0 200 160" fill="none">
+        <rect x="20" y="90" width="60" height="8" rx="2" fill="#1f3327"/>
+        <rect x="24" y="98" width="6" height="40" fill="#1f3327"/>
+        <rect x="70" y="98" width="6" height="40" fill="#1f3327"/>
+        <ellipse cx="50" cy="60" rx="14" ry="20" fill="#3E887B"/>
+        <circle cx="50" cy="35" r="10" fill="#5CA490"/>
+        <path d="M50 80 Q75 75 90 60" stroke="#5CA490" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <path d="M90 60 Q95 80 92 100" stroke="#3E887B" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <path d="M40 40 Q70 30 88 58" stroke="#CEE4D8" stroke-width="6" stroke-linecap="round" fill="none"/>
+        <circle cx="88" cy="58" r="8" fill="#CEE4D8"/>
+        <text x="100" y="42" font-family="DM Mono, monospace" font-size="9" fill="#d4943a">push</text>
+        <text x="100" y="85" font-family="DM Mono, monospace" font-size="9" fill="#d4943a">resist</text>
+      </svg>
+    </div>
+    <div class="ex-cue">Seated, lift one knee toward 90°. Press down on the thigh with your own hand while the leg resists — pure tension, no movement. This calms tendon pain while still loading it safely.</div>
+    <div class="ex-sets">3 holds × 20–30 sec each leg</div>
+  </div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">02</div>
+      <div class="ex-info">
+        <div class="ex-stage">Stage 2</div>
+        <div class="ex-name">Slow supine leg raise</div>
+      </div>
+    </div>
+    <div class="ex-diagram">
+      <svg viewBox="0 0 200 120" fill="none">
+        <line x1="10" y1="100" x2="190" y2="100" stroke="#1f3327" stroke-width="2"/>
+        <ellipse cx="50" cy="90" rx="22" ry="10" fill="#3E887B"/>
+        <circle cx="22" cy="88" r="10" fill="#5CA490"/>
+        <path d="M65 92 Q110 70 150 45" stroke="#5CA490" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <path d="M65 95 Q100 95 130 95" stroke="#1f3327" stroke-width="9" stroke-linecap="round" fill="none" opacity="0.5" stroke-dasharray="4 4"/>
+        <path d="M75 92 A 30 30 0 0 1 95 67" stroke="#d4943a" stroke-width="1.5" fill="none" stroke-dasharray="2 3"/>
+        <text x="85" y="60" font-family="DM Mono, monospace" font-size="9" fill="#d4943a">~45°</text>
+      </svg>
+    </div>
+    <div class="ex-cue">Lying flat, slowly raise one straight leg to about 45°. Pause at the top. Lower with control — the slow lowering is where the tendon does the real work. No fast reps.</div>
+    <div class="ex-sets">8–10 reps each leg · 3 sec up · 1 sec hold · 3 sec down</div>
+  </div>
+
+  <div class="ex-card">
+    <div class="ex-card-header">
+      <div class="ex-num">03</div>
+      <div class="ex-info">
+        <div class="ex-stage">Stage 3</div>
+        <div class="ex-name">Standing march (controlled)</div>
+      </div>
+    </div>
+    <div class="ex-diagram">
+      <svg viewBox="0 0 200 160" fill="none">
+        <line x1="10" y1="145" x2="190" y2="145" stroke="#1f3327" stroke-width="2"/>
+        <path d="M85 145 L88 100" stroke="#3E887B" stroke-width="12" stroke-linecap="round"/>
+        <ellipse cx="90" cy="75" rx="16" ry="24" fill="#3E887B"/>
+        <circle cx="92" cy="42" r="11" fill="#5CA490"/>
+        <path d="M95 85 Q120 75 128 55" stroke="#5CA490" stroke-width="12" stroke-linecap="round" fill="none"/>
+        <path d="M128 55 Q130 75 122 95" stroke="#3E887B" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <line x1="60" y1="75" x2="150" y2="75" stroke="#d4943a" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+        <text x="140" y="72" font-family="DM Mono, monospace" font-size="8" fill="#d4943a">hip height</text>
+      </svg>
+    </div>
+    <div class="ex-cue">Slow, deliberate knee-to-chest marches in place. No bounce, no speed — this is about controlled strength through the full range, not cardio.</div>
+    <div class="ex-sets">10 reps each leg · 2 sec up · 2 sec down</div>
+  </div>
+
+  <div class="ex-card hardest">
+    <div class="ex-card-header">
+      <div class="ex-num">04</div>
+      <div class="ex-info">
+        <div class="ex-stage">Stage 4 · Gentle only</div>
+        <div class="ex-name">Couch stretch</div>
+      </div>
+    </div>
+    <div class="ex-diagram">
+      <svg viewBox="0 0 200 140" fill="none">
+        <rect x="150" y="20" width="8" height="110" fill="#1f3327"/>
+        <line x1="10" y1="130" x2="190" y2="130" stroke="#1f3327" stroke-width="2"/>
+        <path d="M152 125 L150 75" stroke="#3E887B" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="150" cy="125" r="6" fill="#5CA490"/>
+        <path d="M150 75 Q120 60 100 75" stroke="#5CA490" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <ellipse cx="92" cy="55" rx="14" ry="22" fill="#3E887B"/>
+        <circle cx="90" cy="25" r="10" fill="#5CA490"/>
+        <path d="M85 75 Q70 90 55 95" stroke="#3E887B" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <path d="M55 95 L40 100" stroke="#1f3327" stroke-width="9" stroke-linecap="round"/>
+        <ellipse cx="115" cy="68" rx="14" ry="8" fill="#d4943a" opacity="0.25"/>
+      </svg>
+    </div>
+    <div class="ex-cue">Kneeling, back foot up against a wall or couch, front foot forward. Gentle stretch through the front of the back hip. Stop well short of sharp pain — mild tension only, especially while the tendon is irritated.</div>
+    <div class="ex-sets">20–30 sec hold · 2 reps each side</div>
+  </div>
+
+  <div class="note-card" style="border-color:var(--amber)">
+    <div class="note-title" style="color:var(--amber)">⚠ Progression note</div>
+    <div class="note-body">Start with Stage 1 only for the first week or two. Add Stage 2 once isometrics feel easy and pain-free. Stages 3–4 come later, once tendon tolerance is established. Sharp pain at any stage means back off, not push through.</div>
   </div>
 </div>
 

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hip Flexor Weekly — TEST</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root {
+  --bg:#0a1510;--surface:#111d16;--surface2:#172219;--border:#1f3327;
+  --lightest:#CEE4D8;--light:#B2D3C2;--light-mid:#8CB9A5;--mid:#5CA490;--mid-dark:#3E887B;--dark:#1A5A4C;
+  --muted:#5a8870;--amber:#d4943a;--gold:#c9a84c;--red:#d95f5f;
+  --ff:'DM Sans',sans-serif;--fm:'DM Mono',monospace;--fd:'DM Serif Display',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--lightest);font-family:var(--ff);padding:24px 18px 60px;max-width:480px;margin:0 auto;}
+.demo-tag{background:rgba(212,148,58,.12);border:1px solid rgba(212,148,58,.3);border-radius:8px;padding:8px 12px;font-family:var(--fm);font-size:11px;color:var(--amber);text-align:center;margin-bottom:20px;}
+h1{font-family:var(--fd);font-size:26px;color:var(--lightest);margin-bottom:4px;}
+.sub{font-size:12px;color:var(--muted);margin-bottom:24px;}
+.sec-label{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin:24px 0 10px;}
+
+.tracker-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.tracker-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.tracker-label{font-size:13px;color:var(--light);font-weight:600;}
+.tracker-count{font-family:var(--fm);font-size:16px;color:var(--mid);}
+.tracker-bar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--border);}
+.tracker-fill{height:100%;background:linear-gradient(90deg,var(--mid-dark),var(--mid));border-radius:99px;transition:width .4s;}
+
+.action-row{display:flex;gap:8px;margin-top:14px;}
+.action-btn{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;font-size:12px;color:var(--light-mid);cursor:pointer;transition:all .15s;}
+.action-btn:hover{border-color:var(--mid-dark);}
+.action-btn.workout{color:var(--mid);}
+
+.week-status{margin-top:16px;padding:12px;border-radius:10px;font-size:12px;text-align:center;}
+.week-status.incomplete{background:var(--surface2);color:var(--muted);}
+.week-status.perfect{background:rgba(92,164,144,.12);border:1px solid rgba(92,164,144,.3);color:var(--mid);font-weight:600;}
+
+.chest-section{margin-top:24px;}
+.chest-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.chest-card.unlocked{border-color:var(--mid-dark);}
+.chest-icon{font-size:28px;}
+.chest-info{flex:1;}
+.chest-name{font-size:13px;font-weight:700;color:var(--lightest);}
+.chest-req{font-size:11px;color:var(--muted);margin-top:2px;}
+.chest-btn{background:var(--dark);border:1px solid var(--mid-dark);color:var(--lightest);font-family:var(--fm);font-size:11px;padding:7px 14px;border-radius:8px;cursor:pointer;}
+
+.reset-row{margin-top:30px;padding-top:16px;border-top:1px solid var(--border);}
+.reset-btn{width:100%;background:rgba(217,95,95,.1);border:1px solid rgba(217,95,95,.3);color:var(--red);font-family:var(--fm);font-size:11px;padding:10px;border-radius:10px;cursor:pointer;}
+
+.debug-box{margin-top:20px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:var(--fm);font-size:10px;color:var(--muted);line-height:1.7;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);border:1px solid var(--mid-dark);border-radius:10px;padding:12px 20px;font-size:13px;color:var(--lightest);opacity:0;transition:all .3s;z-index:200;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:300;padding:20px;}
+.modal.show{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--mid-dark);border-radius:16px;padding:28px 24px;max-width:320px;text-align:center;}
+.modal-icon{font-size:40px;margin-bottom:10px;}
+.modal-title{font-family:var(--fd);font-size:20px;color:var(--lightest);margin-bottom:8px;}
+.modal-reward{font-family:var(--fm);font-size:22px;color:var(--gold);margin:14px 0;}
+.modal-btn{background:var(--dark);border:1px solid var(--mid-dark);color:var(--lightest);font-family:var(--ff);font-weight:600;font-size:13px;padding:10px 22px;border-radius:10px;cursor:pointer;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<div class="demo-tag">🧪 STANDALONE TEST — separate storage, no GitHub needed</div>
+
+<h1>Hip Flexor Weekly</h1>
+<div class="sub">3x hip flexor + 2x workout/pickup = perfect week</div>
+
+<div class="sec-label">This week</div>
+
+<div class="tracker-card">
+  <div class="tracker-row">
+    <div class="tracker-label">🦵 Hip flexor sessions</div>
+    <div class="tracker-count" id="hipCount">0 / 3</div>
+  </div>
+  <div class="tracker-bar"><div class="tracker-fill" id="hipBar" style="width:0%"></div></div>
+  <div class="action-row">
+    <div class="action-btn" onclick="logHip()">+ Log hip session</div>
+  </div>
+</div>
+
+<div class="tracker-card">
+  <div class="tracker-row">
+    <div class="tracker-label">⚽ Workout / pickup combo</div>
+    <div class="tracker-count" id="workoutCount">0 / 2</div>
+  </div>
+  <div class="tracker-bar"><div class="tracker-fill" id="workoutBar" style="width:0%"></div></div>
+  <div class="action-row">
+    <div class="action-btn workout" onclick="logWorkout()">+ Log workout</div>
+    <div class="action-btn workout" onclick="logPickup()">+ Log pickup</div>
+  </div>
+</div>
+
+<div class="week-status incomplete" id="weekStatus">Keep going — perfect week not yet hit</div>
+
+<div class="chest-section">
+  <div class="sec-label">Perfect Week Chest</div>
+  <div class="chest-card" id="weekChestCard">
+    <div class="chest-icon">🔒</div>
+    <div class="chest-info">
+      <div class="chest-name">Perfect Week Reward</div>
+      <div class="chest-req" id="chestReq">Hit 3x hip + 2x workout/pickup to unlock</div>
+    </div>
+  </div>
+</div>
+
+<div class="reset-row">
+  <button class="reset-btn" onclick="resetTest()">↺ Reset test data</button>
+</div>
+
+<div class="debug-box" id="debugBox">—</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">Perfect Week!</div>
+    <div style="font-size:12px;color:var(--light-mid);">3x hip + 2x workout/pickup — banked.</div>
+    <div class="modal-reward" id="modalAmount">$0</div>
+    <button class="modal-btn" onclick="closeModal()">Add to wallet</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'hipflexor_weekly_TEST';
+const WEEK_LOOT = [10,11,12,13,14,15,16,17,18,19,20];
+
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+function getWeekKey(){
+  // ISO-ish week key: year + week number, Monday start
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - ((d.getDay()+6)%7));
+  const week1 = new Date(d.getFullYear(),0,4);
+  const weekNum = 1 + Math.round(((d-week1)/86400000 - 3 + ((week1.getDay()+6)%7))/7);
+  return d.getFullYear()+'-W'+weekNum;
+}
+
+const defState = {
+  weekKey: getWeekKey(),
+  hipCount: 0,
+  workoutCount: 0,
+  chestOpened: false,
+  walletTotal: 0,
+  lastActiveWeek: getWeekKey()
+};
+
+let state = load() || {...defState};
+Object.keys(defState).forEach(k=>{ if(state[k]===undefined) state[k]=defState[k]; });
+
+// Soft reset rule: only reset if a FULL week passed with zero activity
+function checkWeekRollover(){
+  const currentWeek = getWeekKey();
+  if(state.weekKey !== currentWeek){
+    const hadActivity = state.hipCount > 0 || state.workoutCount > 0;
+    if(!hadActivity){
+      // Zero activity last week — hard reset
+      state.hipCount = 0;
+      state.workoutCount = 0;
+      state.chestOpened = false;
+      showToast('New week — previous week had no activity, fresh start');
+    } else {
+      // Had some activity — still reset counts for new week, but don't punish further
+      state.hipCount = 0;
+      state.workoutCount = 0;
+      state.chestOpened = false;
+      showToast('New week started — counts reset, progress continues');
+    }
+    state.weekKey = currentWeek;
+    save();
+  }
+}
+checkWeekRollover();
+
+function logHip(){
+  if(state.hipCount >= 3){ showToast('Already at weekly target (3/3)'); return; }
+  state.hipCount++;
+  showToast('+1 hip flexor session logged 🦵');
+  save(); updateUI(); checkPerfectWeek();
+}
+
+function logWorkout(){
+  if(state.workoutCount >= 2){ showToast('Already at weekly target (2/2)'); return; }
+  state.workoutCount++;
+  showToast('+1 workout logged 💪');
+  save(); updateUI(); checkPerfectWeek();
+}
+
+function logPickup(){
+  if(state.workoutCount >= 2){ showToast('Already at weekly target (2/2)'); return; }
+  state.workoutCount++;
+  showToast('+1 pickup session logged ⚽');
+  save(); updateUI(); checkPerfectWeek();
+}
+
+function checkPerfectWeek(){
+  if(state.hipCount >= 3 && state.workoutCount >= 2 && !state.chestOpened){
+    unlockWeekChest();
+  }
+}
+
+function unlockWeekChest(){
+  const card = document.getElementById('weekChestCard');
+  const req = document.getElementById('chestReq');
+  card.classList.add('unlocked');
+  card.querySelector('.chest-icon').textContent = '🎁';
+  req.textContent = 'Unlocked! Tap to open';
+  card.onclick = openWeekChest;
+  card.style.cursor = 'pointer';
+}
+
+function openWeekChest(){
+  if(state.chestOpened) return;
+  const amount = WEEK_LOOT[Math.floor(Math.random()*WEEK_LOOT.length)];
+  state.chestOpened = true;
+  document.getElementById('modalAmount').textContent = '$'+amount;
+  document.getElementById('modal').classList.add('show');
+  document.querySelector('.modal-btn').onclick = ()=>{
+    state.walletTotal += amount;
+    closeModal();
+    save(); updateUI();
+    showToast('+$'+amount+' added to wallet 💰');
+  };
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('show');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function resetTest(){
+  if(!confirm('Reset all test data? This clears the standalone test only — does not touch your real app.')) return;
+  state = {...defState, weekKey: getWeekKey()};
+  save(); updateUI();
+  showToast('Test data reset');
+}
+
+function updateUI(){
+  document.getElementById('hipCount').textContent = state.hipCount+' / 3';
+  document.getElementById('hipBar').style.width = Math.min(state.hipCount/3*100,100)+'%';
+  document.getElementById('workoutCount').textContent = state.workoutCount+' / 2';
+  document.getElementById('workoutBar').style.width = Math.min(state.workoutCount/2*100,100)+'%';
+
+  const statusEl = document.getElementById('weekStatus');
+  const perfect = state.hipCount>=3 && state.workoutCount>=2;
+  statusEl.className = 'week-status '+(perfect?'perfect':'incomplete');
+  statusEl.textContent = perfect ? '✓ Perfect week — chest unlocked below!' : 'Keep going — perfect week not yet hit';
+
+  if(perfect && !state.chestOpened){
+    unlockWeekChest();
+  } else if(state.chestOpened){
+    const card = document.getElementById('weekChestCard');
+    card.classList.remove('unlocked');
+    card.querySelector('.chest-icon').textContent = '✓';
+    document.getElementById('chestReq').textContent = 'Opened this week — wallet: $'+state.walletTotal;
+    card.onclick = null;
+    card.style.cursor = 'default';
+  }
+
+  document.getElementById('debugBox').innerHTML =
+    'Week key: '+state.weekKey+'<br>'+
+    'Hip: '+state.hipCount+'/3 · Workout: '+state.workoutCount+'/2<br>'+
+    'Chest opened: '+state.chestOpened+'<br>'+
+    'Wallet total: $'+state.walletTotal;
+}
+
+updateUI();
+</script>
+</body>
+</html>
