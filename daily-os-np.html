@@ -172,6 +172,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 .chest-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;}
 .chest-card.unlocked{border-color:var(--mid-dark);}
 .chest-card.opened{opacity:.5;}
+
+.tracker-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;}
+.tracker-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:8px;}
+.tracker-label{font-size:13px;color:var(--light);font-weight:600;}
+.tracker-count{font-family:var(--fm);font-size:14px;color:var(--mid);white-space:nowrap;}
+.tracker-bar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--border);}
+.tracker-fill{height:100%;background:linear-gradient(90deg,var(--mid-dark),var(--mid));border-radius:99px;transition:width .4s;}
+.tracker-action-row{display:flex;gap:8px;margin-top:10px;}
+.tracker-btn{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 8px;text-align:center;font-size:12px;color:var(--light-mid);cursor:pointer;transition:all .15s;}
+.tracker-btn:hover{border-color:var(--mid-dark);}
+.tracker-note{margin-top:10px;font-size:11px;color:var(--muted);text-align:center;}
 .chest-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
 .chest-icon{font-size:28px;line-height:1;}
 .chest-info{flex:1;}
@@ -353,7 +364,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 <div class="header">
   <div class="header-top">
     <div class="header-left">
-      <div class="eyebrow" id="eyebrow">Daily OS · Pre-launch · v0.52</div>
+      <div class="eyebrow" id="eyebrow">Daily OS · Pre-launch · v0.54</div>
       <div class="player-name">Naveen</div>
       <div class="date-display" id="dateDisplay">—</div>
     </div>
@@ -389,6 +400,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
   <button class="tab" onclick="switchTab('calendar',this)">Calendar</button>
   <button class="tab active" onclick="switchTab('schedule',this)">Schedule</button>
   <button class="tab" onclick="switchTab('quests',this)">Quests</button>
+  <button class="tab" onclick="switchTab('health',this)">Health</button>
   <button class="tab" onclick="switchTab('chests',this)">Chests</button>
   <button class="tab" onclick="switchTab('sleep',this)">Sleep</button>
 </div>
@@ -950,11 +962,58 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
   <button class="reset-btn" onclick="resetQuests()">↺ Reset all quests</button>
 </div>
 
+<!-- ══ HEALTH ══ -->
+<div class="panel" id="panel-health">
+
+  <div class="sec-label">Workout Plan</div>
+  <a href="workout-np.html" target="_blank" class="chest-card" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;">
+    <div class="chest-icon" style="font-size:28px;">📋</div>
+    <div class="chest-info" style="flex:1;">
+      <div class="chest-name">Full routine + form cues</div>
+      <div class="chest-req">Day A · Day B · Hip Flexor schematics · Notes</div>
+    </div>
+    <div style="color:var(--mid);font-family:var(--fm);font-size:16px;">›</div>
+  </a>
+
+  <div class="sec-label">This Week</div>
+  <div class="tracker-card" id="weeklyTrackerCard">
+    <div class="tracker-row"><div class="tracker-label">🦵 Hip flexor sessions</div><div class="tracker-count" id="hipWeekCount">0 / 3</div></div>
+    <div class="tracker-bar"><div class="tracker-fill" id="hipWeekBar" style="width:0%"></div></div>
+    <div class="tracker-action-row"><div class="tracker-btn" onclick="logHip()">+ Log hip session</div></div>
+    <div class="tracker-row" style="margin-top:14px;"><div class="tracker-label">⚽ Workout / pickup combo</div><div class="tracker-count" id="workoutWeekCount">0 / 2</div></div>
+    <div class="tracker-bar"><div class="tracker-fill" id="workoutWeekBar" style="width:0%"></div></div>
+    <div class="tracker-action-row">
+      <div class="tracker-btn" onclick="logWeeklyWorkout('workout')">+ Log workout</div>
+      <div class="tracker-btn" onclick="logWeeklyWorkout('pickup')">+ Log pickup</div>
+    </div>
+    <div class="tracker-note" id="weeklyTrackerNote">Hit 3x hip + 2x workout/pickup for a Perfect Week Chest</div>
+  </div>
+
+  <div class="sec-label">Log an Exercise</div>
+  <div class="tracker-card">
+    <div style="display:flex;gap:8px;margin-bottom:8px;">
+      <input id="exName" type="text" placeholder="Exercise (e.g. Push-ups)" style="flex:2;background:var(--surface2);border:1px solid var(--border);color:var(--lightest);font-family:var(--ff);font-size:13px;padding:8px 10px;border-radius:8px;min-width:0;">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input id="exSets" type="number" min="1" placeholder="Sets" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--lightest);font-family:var(--fm);font-size:13px;padding:8px 10px;border-radius:8px;min-width:0;">
+      <input id="exReps" type="number" min="1" placeholder="Reps" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--lightest);font-family:var(--fm);font-size:13px;padding:8px 10px;border-radius:8px;min-width:0;">
+      <div class="tracker-btn" style="flex:1;" onclick="logExercise()">+ Log</div>
+    </div>
+    <div id="exLogList"></div>
+    <div id="exLogEmpty" style="font-size:11px;color:var(--muted);text-align:center;padding:6px;">Nothing logged today yet</div>
+  </div>
+
+</div>
+
 <div class="panel" id="panel-chests">
 
   <div class="sec-label">Daily Chests</div>
   <div id="dailyChestList"></div>
   <div id="noDailyChests" style="font-size:12px;color:var(--muted);text-align:center;padding:16px;background:var(--surface);border-radius:10px;margin-bottom:10px;">No daily chests yet — earn one on your next perfect day 🌿</div>
+
+  <div class="sec-label">Weekly Chest</div>
+  <div id="weeklyChestList"></div>
+  <div id="noWeeklyChests" style="font-size:12px;color:var(--muted);text-align:center;padding:16px;background:var(--surface);border-radius:10px;margin-bottom:10px;">No Perfect Week chest yet — 3x hip flexor + 2x workout/pickup this week 🦵</div>
 
   <div class="sec-label">Milestone Chests</div>
 
@@ -1117,6 +1176,7 @@ const QUEST_DIFF = {
 const EARPHONE_UNLOCKS = ['bed1','bed2','bed3','cl1','cl2','cl3'];
 const WEEKEND_BONUS = 30;
 const DAILY_LOOT = [2,3,3,4,4,5,5,6,7,8];
+const WEEK_LOOT = [10,11,12,13,14,15,16,17,18,19,20];
 
 // Chest dollar ranges — randomized at open time
 const CHEST_RANGES = {
@@ -1179,7 +1239,10 @@ const defState = {
   subItems:{}, tidyLevel:null, // date -> {blocks:bool, perfect:bool, xp:num, questStars:num, weekendQuests:num}
   dailyChests:[], lastOpenedDailyChestIdx:undefined,
   tidyWasBeforeGaming:false,
-  gamingTapped:false, gamingTappedDate:null
+  gamingTapped:false, gamingTappedDate:null,
+  weeklyWeekKey:null, hipCount:0, workoutCount:0,
+  weeklyChests:[], weeklyChestEarnedFor:null,
+  exerciseLog:{}
 };
 
 let state = load()||{...defState};
@@ -1207,6 +1270,31 @@ if(state.lastRerollWeek!==weekNum){
   state.lastRerollWeek=weekNum;
   save();
 }
+
+// Hip Flexor Weekly — ISO-ish week key, Monday start
+function getWeekKey(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - ((d.getDay()+6)%7));
+  const week1 = new Date(d.getFullYear(),0,4);
+  const wk = 1 + Math.round(((d-week1)/86400000 - 3 + ((week1.getDay()+6)%7))/7);
+  return d.getFullYear()+'-W'+wk;
+}
+function checkWeekRollover(){
+  const currentWeek = getWeekKey();
+  if(state.weeklyWeekKey !== currentWeek){
+    const hadActivity = (state.hipCount||0) > 0 || (state.workoutCount||0) > 0;
+    const isFirstRun = state.weeklyWeekKey === null;
+    state.hipCount = 0;
+    state.workoutCount = 0;
+    state.weeklyWeekKey = currentWeek;
+    save();
+    if(!isFirstRun){
+      showToast(hadActivity ? 'New week — hip flexor tracker reset, progress continues' : 'New week — hip flexor tracker reset');
+    }
+  }
+}
+checkWeekRollover();
 
 // ── HELPERS ──
 function isWeekend(d){ const day=(d||new Date()).getDay(); return day===0||day===6; }
@@ -1666,6 +1754,152 @@ function openDailyChest(idx){
   showLootToast('🌿 +$'+amount+' gaming dollars — reroll available', true);
 }
 
+// ── HIP FLEXOR WEEKLY ──
+function logHip(){
+  if((state.hipCount||0) >= 3){ showToast('Already at weekly target (3/3) 🦵'); return; }
+  state.hipCount = (state.hipCount||0)+1;
+  showToast('+1 hip flexor session logged 🦵 ('+state.hipCount+'/3)');
+  save(); updateUI(); checkPerfectWeek();
+}
+
+function logWeeklyWorkout(kind){
+  if((state.workoutCount||0) >= 2){ showToast('Already at weekly target (2/2)'); return; }
+  state.workoutCount = (state.workoutCount||0)+1;
+  const label = kind==='pickup' ? 'pickup session logged ⚽' : 'workout logged 💪';
+  showToast('+1 '+label+' ('+state.workoutCount+'/2)');
+  save(); updateUI(); checkPerfectWeek();
+}
+
+function checkPerfectWeek(){
+  const perfect = (state.hipCount||0)>=3 && (state.workoutCount||0)>=2;
+  if(!perfect) return;
+  if(state.weeklyChestEarnedFor === state.weeklyWeekKey) return; // already granted this week
+  state.weeklyChestEarnedFor = state.weeklyWeekKey;
+  if(!state.weeklyChests) state.weeklyChests = [];
+  state.weeklyChests.push({ id:'weekly_'+Date.now(), opened:false, amount:null });
+  save(); updateUI();
+  showLootToast('Perfect Week! 🦵⚽ A Perfect Week Chest is waiting in Chests', false);
+}
+
+function updateWeeklyTracker(){
+  const hipCountEl=document.getElementById('hipWeekCount');
+  if(!hipCountEl) return;
+  const hipBar=document.getElementById('hipWeekBar');
+  const workCountEl=document.getElementById('workoutWeekCount');
+  const workBar=document.getElementById('workoutWeekBar');
+  const note=document.getElementById('weeklyTrackerNote');
+  const hip=state.hipCount||0, work=state.workoutCount||0;
+  hipCountEl.textContent=hip+' / 3';
+  hipBar.style.width=Math.min(hip/3*100,100)+'%';
+  workCountEl.textContent=work+' / 2';
+  workBar.style.width=Math.min(work/2*100,100)+'%';
+  const perfect = hip>=3 && work>=2;
+  if(note){
+    note.textContent = perfect ? '✓ Perfect week — chest waiting in Chests tab!' : 'Hit 3x hip + 2x workout/pickup for a Perfect Week Chest';
+    note.style.color = perfect ? 'var(--mid)' : 'var(--muted)';
+  }
+}
+
+function renderWeeklyChests(){
+  const list = document.getElementById('weeklyChestList');
+  const empty = document.getElementById('noWeeklyChests');
+  if(!list) return;
+  const chests = state.weeklyChests || [];
+
+  if(chests.length === 0){
+    list.innerHTML = '';
+    if(empty) empty.style.display = 'block';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+
+  let html = '';
+  chests.forEach((c, idx) => {
+    if(c.opened){
+      html += `<div class="chest-card opened" style="opacity:.55;">
+        <div class="chest-header"><div class="chest-icon">🦵</div><div class="chest-info"><div class="chest-name">Perfect Week Chest</div><div class="chest-req">Opened — $${c.amount}</div></div><div class="chest-status" style="color:var(--muted)">✓</div></div>
+      </div>`;
+    } else {
+      html += `<div class="chest-card unlocked" id="weeklychest-${idx}">
+        <div class="chest-header"><div class="chest-icon">🦵</div><div class="chest-info"><div class="chest-name">Perfect Week Chest</div><div class="chest-req">3x hip + 2x workout/pickup — ready</div></div><div class="chest-status" style="color:var(--mid)">Unlocked!</div></div>
+        <button class="chest-btn show" onclick="openWeeklyChest(${idx})">Open Chest</button>
+      </div>`;
+    }
+  });
+  list.innerHTML = html;
+}
+
+function openWeeklyChest(idx){
+  if(!state.weeklyChests || !state.weeklyChests[idx]) return;
+  const chest = state.weeklyChests[idx];
+  if(chest.opened) return;
+
+  const amount = WEEK_LOOT[Math.floor(Math.random()*WEEK_LOOT.length)];
+  chest.opened = true;
+  chest.amount = amount;
+  state.lootTotal = (state.lootTotal||0) + amount;
+
+  save(); updateUI();
+  showLootToast('🦵 +$'+amount+' added to wallet — Perfect Week!', true);
+}
+
+// ── EXERCISE LOG ──
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function logExercise(){
+  const nameEl=document.getElementById('exName');
+  const setsEl=document.getElementById('exSets');
+  const repsEl=document.getElementById('exReps');
+  const name=(nameEl.value||'').trim();
+  const sets=parseInt(setsEl.value)||0;
+  const reps=parseInt(repsEl.value)||0;
+  if(!name){ showToast('Enter an exercise name'); return; }
+
+  if(!state.exerciseLog) state.exerciseLog={};
+  const dayKey=getGameDay();
+  if(!state.exerciseLog[dayKey]) state.exerciseLog[dayKey]=[];
+  state.exerciseLog[dayKey].push({ id:'ex_'+Date.now(), name, sets, reps, ts:Date.now() });
+
+  nameEl.value=''; setsEl.value=''; repsEl.value='';
+  save(); updateUI();
+  showToast('Logged: '+(sets&&reps?sets+'×'+reps+' ':'')+name+' ✅');
+}
+
+function deleteExerciseLog(dayKey, id){
+  if(!state.exerciseLog || !state.exerciseLog[dayKey]) return;
+  state.exerciseLog[dayKey] = state.exerciseLog[dayKey].filter(e=>e.id!==id);
+  save(); updateUI();
+}
+
+function renderExerciseLog(){
+  const list=document.getElementById('exLogList');
+  const empty=document.getElementById('exLogEmpty');
+  if(!list) return;
+  const dayKey=getGameDay();
+  const entries=(state.exerciseLog&&state.exerciseLog[dayKey])||[];
+
+  if(entries.length===0){
+    list.innerHTML='';
+    if(empty) empty.style.display='block';
+    return;
+  }
+  if(empty) empty.style.display='none';
+
+  let html='';
+  entries.slice().reverse().forEach(e=>{
+    const t=new Date(e.ts).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+    const setsReps = (e.sets&&e.reps) ? e.sets+'×'+e.reps+' ' : '';
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 2px;border-bottom:1px solid var(--border);font-size:12px;">
+      <div><span style="color:var(--mid);font-family:var(--fm);">${setsReps}</span><span style="color:var(--light);">${escHtml(e.name)}</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:var(--muted);font-family:var(--fm);font-size:10px;">${t}</span>
+        <span style="color:var(--muted);cursor:pointer;" onclick="deleteExerciseLog('${dayKey}','${e.id}')">✕</span>
+      </div>
+    </div>`;
+  });
+  list.innerHTML=html;
+}
+
 function updateChests(){
   const xp=state.xp,stars=state.starCount||0;
   [
@@ -1692,6 +1926,7 @@ function updateChests(){
     if(card){card.classList.toggle('unlocked',unlocked&&!opened);card.classList.toggle('opened',!!opened);}
   });
   renderDailyChests();
+  renderWeeklyChests();
 }
 
 // ── REROLL ──
@@ -1720,7 +1955,7 @@ function useReroll(){
 function updateUI(){
   const weekend=isWeekend();
   document.getElementById('weekendBanner').classList.toggle('show',weekend);
-  document.getElementById('eyebrow').textContent=weekend?'Daily OS · Weekend 🌿 · v0.52':'Daily OS · Pre-launch · v0.52';
+  document.getElementById('eyebrow').textContent=weekend?'Daily OS · Weekend 🌿 · v0.54':'Daily OS · Pre-launch · v0.54';
 
   // Sync gaming badge state on load
   const gamingBadge = document.getElementById('gaming-badge');
@@ -1835,6 +2070,8 @@ function updateUI(){
   updateTidyDisplay();
   updateAllRecurringBadges();
   updateMiniAccordions();
+  updateWeeklyTracker();
+  renderExerciseLog();
   sinkCompletedQuests();
   sinkCompletedFolders();
   if(document.getElementById("debugPanel")?.style.display!=="none") updateDebug();
