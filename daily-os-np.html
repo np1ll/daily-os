@@ -364,7 +364,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
 <div class="header">
   <div class="header-top">
     <div class="header-left">
-      <div class="eyebrow" id="eyebrow">Daily OS · Pre-launch · v0.54</div>
+      <div class="eyebrow" id="eyebrow">Daily OS · Pre-launch · v0.56</div>
       <div class="player-name">Naveen</div>
       <div class="date-display" id="dateDisplay">—</div>
     </div>
@@ -989,7 +989,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--ff);min-height:100
     <div class="tracker-note" id="weeklyTrackerNote">Hit 3x hip + 2x workout/pickup for a Perfect Week Chest</div>
   </div>
 
-  <div class="sec-label">Log an Exercise</div>
+  <div class="sec-label">Exercise Log</div>
+  <div class="tracker-note" style="margin:-2px 0 10px;text-align:left;">The 12 routine exercises (Day A/B + Hip Flexor) log directly from the <a href="workout-np.html" target="_blank" style="color:var(--mid);">workout page</a> and show up below automatically. Use this box for anything outside the routine.</div>
   <div class="tracker-card">
     <div style="display:flex;gap:8px;margin-bottom:8px;">
       <input id="exName" type="text" placeholder="Exercise (e.g. Push-ups)" style="flex:2;background:var(--surface2);border:1px solid var(--border);color:var(--lightest);font-family:var(--ff);font-size:13px;padding:8px 10px;border-radius:8px;min-width:0;">
@@ -1852,17 +1853,17 @@ function logExercise(){
   const repsEl=document.getElementById('exReps');
   const name=(nameEl.value||'').trim();
   const sets=parseInt(setsEl.value)||0;
-  const reps=parseInt(repsEl.value)||0;
+  const amount=parseInt(repsEl.value)||0;
   if(!name){ showToast('Enter an exercise name'); return; }
 
   if(!state.exerciseLog) state.exerciseLog={};
   const dayKey=getGameDay();
   if(!state.exerciseLog[dayKey]) state.exerciseLog[dayKey]=[];
-  state.exerciseLog[dayKey].push({ id:'ex_'+Date.now(), name, sets, reps, ts:Date.now() });
+  state.exerciseLog[dayKey].push({ id:'ex_'+Date.now(), name, sets, amount, unit:'reps', ts:Date.now() });
 
   nameEl.value=''; setsEl.value=''; repsEl.value='';
   save(); updateUI();
-  showToast('Logged: '+(sets&&reps?sets+'×'+reps+' ':'')+name+' ✅');
+  showToast('Logged: '+(sets&&amount?sets+'×'+amount+' ':'')+name+' ✅');
 }
 
 function deleteExerciseLog(dayKey, id){
@@ -1888,9 +1889,11 @@ function renderExerciseLog(){
   let html='';
   entries.slice().reverse().forEach(e=>{
     const t=new Date(e.ts).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
-    const setsReps = (e.sets&&e.reps) ? e.sets+'×'+e.reps+' ' : '';
+    const amt = (e.amount!==undefined) ? e.amount : e.reps; // back-compat with pre-unit entries
+    const unitSuffix = e.unit==='sec' ? 'sec' : '';
+    const setsAmt = (e.sets&&amt) ? e.sets+'×'+amt+unitSuffix+' ' : '';
     html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 2px;border-bottom:1px solid var(--border);font-size:12px;">
-      <div><span style="color:var(--mid);font-family:var(--fm);">${setsReps}</span><span style="color:var(--light);">${escHtml(e.name)}</span></div>
+      <div><span style="color:var(--mid);font-family:var(--fm);">${setsAmt}</span><span style="color:var(--light);">${escHtml(e.name)}</span></div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="color:var(--muted);font-family:var(--fm);font-size:10px;">${t}</span>
         <span style="color:var(--muted);cursor:pointer;" onclick="deleteExerciseLog('${dayKey}','${e.id}')">✕</span>
@@ -1955,7 +1958,7 @@ function useReroll(){
 function updateUI(){
   const weekend=isWeekend();
   document.getElementById('weekendBanner').classList.toggle('show',weekend);
-  document.getElementById('eyebrow').textContent=weekend?'Daily OS · Weekend 🌿 · v0.54':'Daily OS · Pre-launch · v0.54';
+  document.getElementById('eyebrow').textContent=weekend?'Daily OS · Weekend 🌿 · v0.56':'Daily OS · Pre-launch · v0.56';
 
   // Sync gaming badge state on load
   const gamingBadge = document.getElementById('gaming-badge');
@@ -2934,26 +2937,51 @@ function sinkCompletedFolders(){
 }
 
 function sinkCompletedQuests(){
-  // Within each folder body, move completed quest cards (not inside mini-accordions) to the bottom
+  // Within each folder body, move completed quest cards to the bottom of their
+  // own q-group section (not the whole folder) so section headers stay attached
+  // to their quests instead of all collapsing to the top.
   Object.keys(FOLDER_QUESTS).forEach(fid=>{
     const body = document.getElementById('fbody-'+fid);
     if(!body) return;
-    // Only target direct-child q-cards, not ones nested inside mini-accordion bodies
-    const cards = Array.from(body.children).filter(el=>el.classList.contains('q-card'));
-    if(cards.length === 0) return;
 
-    const incomplete = [];
-    const complete = [];
-    cards.forEach(card=>{
-      const id = card.id.replace('q-','');
-      const isRecurring = RECURRING_IDS.includes(id);
-      const isDone = isRecurring ? false : !!state.quests[id]; // recurring never "sinks", they're always active
-      (isDone ? complete : incomplete).push(card);
+    // Split body's children into segments: each segment starts at a .q-group
+    // label (or, for content before the first label, has no label) and contains
+    // the .q-card elements that follow it. Other elements (e.g. the leading
+    // spacer) are left untouched in place.
+    const children = Array.from(body.children);
+    const segments = [];
+    let current = { label:null, cards:[] };
+    children.forEach(el=>{
+      if(el.classList.contains('q-group')){
+        segments.push(current);
+        current = { label: el, cards: [] };
+      } else if(el.classList.contains('q-card')){
+        current.cards.push(el);
+      }
     });
+    segments.push(current);
 
-    // Re-append: incomplete first (in original relative order), then complete
-    incomplete.forEach(card=>body.appendChild(card));
-    complete.forEach(card=>body.appendChild(card));
+    if(segments.every(seg=>seg.cards.length===0)) return;
+
+    segments.forEach((seg, i)=>{
+      if(seg.cards.length === 0) return;
+      // Anchor = the next section's label (or null = end of folder for the last section).
+      // Labels never move, so this stays a stable insertion point regardless of order.
+      const anchor = (i+1 < segments.length) ? segments[i+1].label : null;
+
+      const incomplete = [];
+      const complete = [];
+      seg.cards.forEach(card=>{
+        const id = card.id.replace('q-','');
+        const isRecurring = RECURRING_IDS.includes(id);
+        const isDone = isRecurring ? false : !!state.quests[id]; // recurring never "sinks", they're always active
+        (isDone ? complete : incomplete).push(card);
+      });
+
+      // Insert incomplete-then-complete, each immediately before the anchor —
+      // keeps them in this exact order, landing right after this section's own label.
+      incomplete.concat(complete).forEach(card=>body.insertBefore(card, anchor));
+    });
   });
 }
 
